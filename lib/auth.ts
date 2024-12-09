@@ -1,9 +1,12 @@
-import { NextAuthOptions, Session } from "next-auth";
+import NextAuth, { NextAuthOptions, Session } from "next-auth";
 import AzureADProvider from 'next-auth/providers/azure-ad';
+import { JWT, DefaultJWT } from "next-auth/jwt";
+
+const env = process.env;
 
 const getRoleFromEmail = (email: string | undefined): string => {
     if (!email) return "guest";
-    
+
     if (email === "admin@khec.edu.np") {
         return "admin";
     }
@@ -22,40 +25,59 @@ declare module "next-auth" {
             name?: string | null;
             email?: string | null;
             image?: string | null;
-            role?: string;
+            role?: string | null;
         };
+    }
+}
+
+declare module "next-auth/jwt" {
+    interface JWT extends DefaultJWT {
+        role?: string | null;
     }
 }
 
 export const authOptions: NextAuthOptions = {
     providers: [
         AzureADProvider({
-            clientId: process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID!,
-            clientSecret: process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_SECRET!,
-            tenantId: process.env.NEXT_PUBLIC_AZURE_AD_TENANT_ID,
+            clientId: `${env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID}`,
+            clientSecret: `${env.NEXT_PUBLIC_AZURE_AD_CLIENT_SECRET}`,
+            tenantId: `${env.NEXT_PUBLIC_AZURE_AD_TENANT_ID}`,
             authorization: {
                 params: { scope: 'openid email profile User.Read offline_access' },
             },
+            httpOptions: { timeout: 10000 },
         }),
     ],
+    secret: env.NEXTAUTH_SECRET,
     callbacks: {
         async signIn({ user }) {
-            return user.email?.endsWith("@khec.edu.np") ?? false;
+            if (!user.email) {
+                return false;
+            }
+            return user.email.endsWith("@khec.edu.np");
         },
-        async jwt({ token, user }: { token: any, user?: any }) {
+        async jwt({ token, user }) {
             if (user) {
+                console.log("User email:", user.email);
                 token.role = getRoleFromEmail(user.email ?? undefined);
             }
+            console.log("Token in jwt callback:", token);
             return token;
         },
-        async session({ session, token }: { session: Session, token: any }) {
+        async session({ session, token }) {
+            console.log("Token in session callback:", token);
             if (token.role && session.user) {
                 session.user.role = token.role;
             }
+            console.log("Session returned:", session);
             return session;
         },
+
     },
     pages: {
-        signIn: '/auth/signin',
+        signIn: "/auth/signin",
+        signOut: "/auth/signout",
     },
 };
+
+export default NextAuth(authOptions);
