@@ -20,6 +20,7 @@
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.4",
     "next": "15.0.4",
+    "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^2.5.5",
