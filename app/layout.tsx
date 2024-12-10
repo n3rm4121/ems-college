@@ -1,4 +1,3 @@
-import NextAuthProvider from '@/components/providers/SessionProvider';
 
 export default function RootLayout({
   children,
@@ -8,9 +7,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <NextAuthProvider>
           {children}
-        </NextAuthProvider>
       </body>
     </html>
   );

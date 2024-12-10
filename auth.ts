@@ -1,33 +1,58 @@
+import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { saltAndHashPassword, comparePassword } from "./utils/saltAndHashPassword";
+import { getUserFromDb } from "./utils/getUserFromDb";
+import { createUserInDb } from "./utils/createUserInDb";
 
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-import { saltAndHashPassword } from "./utils/saltAndHashPassword"
-import { getUserFromDb } from "./utils/getUserFromDb"
-import { redirect, useRouter } from "next/navigation"
-export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+export const { handlers, signIn, signOut, auth } = NextAuth({  providers: [
+    CredentialsProvider({
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials) => {
-        let user = null
-        // logic to salt and hash password
-        const pwHash = await saltAndHashPassword(credentials.password as string)
-        // logic to verify if the user exists
-        user = await getUserFromDb(credentials.email as string, pwHash)
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // Optionally, this is also the place you could do a user registration
-          redirect("/register")
-          throw new Error("Invalid credentials.")
+      authorize: async (credentials, req) => {
+        console.log('inside authorize callback')
+        if (!credentials) {
+          throw new Error("Credentials are missing.");
+        } 
+
+        const { email, password } = credentials;
+
+        if (typeof email !== "string" || typeof password !== "string") {
+          throw new Error("Invalid credentials format.");
         }
-        // return user object with their profile data
-        return user
+
+        // Check if user exists
+        const user = await getUserFromDb(email, password);
+
+        if (user) {
+          // User exists and password is correct
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          };
+        } else {
+          // If the user doesn't exist, create a new user
+          console.log("user xaina")
+          const pwHash = await saltAndHashPassword(password);
+          const newUser = await createUserInDb({ email, password: pwHash });
+          console.log("New user created:", newUser);
+          return {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+          };
+        }
       },
     }),
   ],
-})
+  session: {
+    strategy: "jwt", // Optional session configuration
+  },
+  pages: {
+    signIn: "/auth/signin", // Custom sign-in page
+    signOut: "/auth/signout",
+    error: "/auth/error", // Error page
+  },
+});
