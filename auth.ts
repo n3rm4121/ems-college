@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { saltAndHashPassword } from "./utils/saltAndHashPassword"
 import { getUserFromDb } from "./utils/getUserFromDb"
-import { redirect, useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
