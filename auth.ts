@@ -53,7 +53,6 @@ export const authOptions: NextAuthOptions = {
       httpOptions: { timeout: 10000 },
     }),
   ],
-  secret: env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user }) {
       if (!user.email) {
