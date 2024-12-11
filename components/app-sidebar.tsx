@@ -1,4 +1,6 @@
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react"
+"use client"
+
+import { Calendar, Home, Users, FileCheck, BarChart, Settings } from 'lucide-react'
 
 import {
     Sidebar,
@@ -10,50 +12,67 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { Button } from './ui/button'
+import { Dialog, DialogContent, DialogTrigger } from './ui/dialog'
+import { CreateEvent } from './createEvent'
 
 const items = [
     {
-        title: "Home",
-        url: "#",
+        title: "Dashboard",
         icon: Home,
+        component: "Dashboard"
     },
     {
-        title: "My Events",
-        url: "#",
-        icon: Inbox,
+        title: "Unapproved Events",
+        icon: FileCheck,
+        component: "UnapprovedEvents"
     },
     {
-        title: "Calendar",
-        url: "#",
+        title: "All Events",
         icon: Calendar,
+        component: "AllEvents"
     },
     {
-        title: "Search",
-        url: "#",
-        icon: Search,
+        title: "User Management",
+        icon: Users,
+        component: "UserManagement"
+    },
+    {
+        title: "Analytics",
+        icon: BarChart,
+        component: "Analytics"
     },
     {
         title: "Settings",
-        url: "#",
         icon: Settings,
+        component: "Settings"
     },
 ]
 
-export function AppSidebar() {
+export function AppSidebar({ setActiveComponent, activeComponent }: { setActiveComponent: (component: string) => void, activeComponent: string }) {
     return (
-        <Sidebar variant="floating">
+        <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
+                    <Dialog>
+                        <DialogTrigger asChild><Button>Create New Event</Button></DialogTrigger>
+                        <DialogContent>
+                            <CreateEvent />
+                        </DialogContent>
+                    </Dialog>
+                    <SidebarGroupLabel>Admin Dashboard</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton size='lg' asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
-                                        </a>
+                                    <SidebarMenuButton
+                                        size='lg'
+                                        onClick={() => setActiveComponent(item.component)}
+                                        className={activeComponent === item.component ? "bg-primary text-primary-foreground hover:bg-primary" : "hover:bg-secondary"}
+                                        aria-current={activeComponent === item.component ? "page" : undefined}
+                                    >
+                                        <item.icon />
+                                        <span>{item.title}</span>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
                             ))}
@@ -64,3 +83,4 @@ export function AppSidebar() {
         </Sidebar>
     )
 }
+
