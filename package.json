@@ -24,6 +24,7 @@
     "lucide-react": "^0.468.0",
     "mongodb": "^6.11.0",
     "mongoose": "^8.8.4",
+    "motion": "^11.13.5",
     "next": "15.0.4",
     "next-auth": "^5.0.0-beta.25",
     "oidc-token-hash": "^5.0.3",
