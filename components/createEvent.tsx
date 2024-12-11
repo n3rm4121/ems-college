@@ -1,3 +1,4 @@
+'use client'
 import React from "react";
 import { EVENT_STEPS } from "../constants/eventSteps";
 import { Button } from "@/components/ui/button";

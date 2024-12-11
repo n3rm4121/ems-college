@@ -6,7 +6,7 @@ interface Event {
   id: string;
   title: string;
   description: string;
-  start_date: string;
+  startDate: string;
   endDate: string;
   startTime: string;
   endTime: string;
@@ -30,13 +30,13 @@ export function EventDetails({ event }: EventDetailsProps) {
           <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">{event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</div>
           <h1 className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">{event.title}</h1>
           <Badge className="mt-2" variant={event.status === 'approved' ? 'default' : 'secondary'}>{event.status}</Badge>
-          
+
           <p className="mt-4 max-w-2xl text-xl text-gray-500">{event.description}</p>
-          
+
           <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex items-center">
               <Calendar className="mr-2 h-5 w-5 text-gray-400" />
-              <span>{new Date(event.start_date).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</span>
+              <span>{new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center">
               <Clock className="mr-2 h-5 w-5 text-gray-400" />
@@ -51,7 +51,7 @@ export function EventDetails({ event }: EventDetailsProps) {
               <span>{event.organizer}</span>
             </div>
           </div>
-          
+
           <div className="mt-8">
             <Button size="lg">Join Event</Button>
           </div>

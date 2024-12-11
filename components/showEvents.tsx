@@ -38,7 +38,7 @@ export default async function Home() {
                 <img src={event.images[0] || '/placeholder.svg?height=600&width=1200'} alt={event.title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-8">
                   <h2 className="text-5xl font-bold text-white text-center mb-4">{event.title}</h2>
-                  <p className="text-2xl text-white mb-8">{new Date(event.start_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-2xl text-white mb-8">{new Date(event.startDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   <Button size="lg" className="bg-white text-indigo-600 hover:bg-indigo-100">Learn More</Button>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export default async function Home() {
                 <CardContent>
                   <div className="flex items-center mb-2 text-gray-600">
                     <Calendar className="mr-2 h-5 w-5" />
-                    <span>{new Date(event.start_date).toLocaleDateString()}</span>
+                    <span>{new Date(event.startDate).toLocaleDateString()}</span>
                   </div>
                   <div className="flex items-center mb-2 text-gray-600">
                     <MapPin className="mr-2 h-5 w-5" />
@@ -111,7 +111,7 @@ export default async function Home() {
         {allEvents.length > 0 && (
           <section className="mb-16">
             <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Featured Event Details</h2>
-              <h1>Event Details</h1>
+            <h1>Event Details</h1>
           </section>
         )}
       </main>
