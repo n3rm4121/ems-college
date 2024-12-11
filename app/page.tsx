@@ -2,8 +2,8 @@ import React from 'react';
 
 function Home() {
   return (
-    <div>
-      Home 
+    <div className='text-3xl'>
+      Home
     </div>
   );
 }
