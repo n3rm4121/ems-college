@@ -10,7 +10,7 @@ export interface IEvent extends Document {
     endTime: string;
     venue: "hall1" | "hall2";
     featured: boolean;
-    organizer_id: ObjectId;
+    organizer_id?: ObjectId;
     status: "pending" | "approved";
 }
 

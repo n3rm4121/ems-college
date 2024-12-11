@@ -1,22 +1,11 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, MapPin, Clock, User } from 'lucide-react'
-
-interface Event {
-  id: string;
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  endTime: string;
-  venue: 'hall1' | 'hall2';
-  organizer: string;
-  status: 'pending' | 'approved';
-}
+import { IEvent } from "@/models/events";
 
 interface EventDetailsProps {
-  event: Event;
+  event: IEvent;
 }
 
 export function EventDetails({ event }: EventDetailsProps) {
@@ -48,7 +37,7 @@ export function EventDetails({ event }: EventDetailsProps) {
             </div>
             <div className="flex items-center">
               <User className="mr-2 h-5 w-5 text-gray-400" />
-              <span>{event.organizer}</span>
+              <span>{event?.organizer_id?.toString()}</span>
             </div>
           </div>
 

@@ -1,9 +1,9 @@
-import EventsLandingPage from '@/components/showEvents';
+import ShowEvents from '@/components/showEvents';
 import React from 'react';
 
 function Home() {
   return (
-    <EventsLandingPage />
+    <ShowEvents />
   );
 }
 

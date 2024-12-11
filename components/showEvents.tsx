@@ -1,3 +1,4 @@
+'use client'
 import { Carousel } from "@/components/ui/carousel"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -6,10 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Search, Calendar, MapPin, Clock, ArrowRight } from 'lucide-react'
 // import { EventDetails } from "@/components/EventDetails"
-import { getEventsFromDb, getFeaturedEventsFromDb, getUpcomingEventsFromDb } from "@/utils/getEventsFromDb"
 import { IEvent } from "@/models/events"
 import { EventDetails } from "./eventDetails"
-
+import { useEffect, useState } from "react"
+import axios from 'axios'
 const eventCategories = [
   { name: 'Academic', icon: '🎓', color: 'bg-blue-500' },
   { name: 'Cultural', icon: '🎭', color: 'bg-purple-500' },
@@ -17,10 +18,29 @@ const eventCategories = [
   { name: 'Technology', icon: '💻', color: 'bg-red-500' },
 ]
 
-export default async function Home() {
-  const featuredEvents = await getFeaturedEventsFromDb();
-  const upcomingEvents = await getUpcomingEventsFromDb();
-  const allEvents = await getEventsFromDb();
+export default function ShowEvents() {
+  // const featuredEvents = await getFeaturedEventsFromDb();
+  // const upcomingEvents = await getUpcomingEventsFromDb();
+  const [allEvents, setAllEvents] = useState<IEvent[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = useState<IEvent[]>([]);
+  useEffect(() => {
+    const fetchAllEvents = async () => {
+      const res = await axios.get('http://localhost:3000/api/events');
+      setAllEvents(res.data);
+      console.log(res)
+
+    }
+    fetchAllEvents();
+    const fetchUpcomingEvents = async () => {
+      const res = await axios.get('http://localhost:3000/api/events/upcoming');
+      (res.data);
+      console.log(res)
+      setUpcomingEvents(res.data);
+
+    }
+    fetchUpcomingEvents();
+
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100">
@@ -32,7 +52,7 @@ export default async function Home() {
 
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
-          <Carousel className="rounded-xl overflow-hidden shadow-2xl">
+          {/* <Carousel className="rounded-xl overflow-hidden shadow-2xl">
             {featuredEvents.map((event) => (
               <div key={event.id.toString()} className="relative h-[500px]">
                 <img src={event.images[0] || '/placeholder.svg?height=600&width=1200'} alt={event.title} className="w-full h-full object-cover" />
@@ -43,7 +63,7 @@ export default async function Home() {
                 </div>
               </div>
             ))}
-          </Carousel>
+          </Carousel> */}
         </section>
 
         <section className="mb-16">
@@ -77,7 +97,7 @@ export default async function Home() {
         <section className="mb-16">
           <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Upcoming Events</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {upcomingEvents.map((event) => (
+            {/* {upcomingEvents.map((event) => (
               <Card key={event.id.toString()} className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                 <CardHeader>
                   <CardTitle className="text-xl font-bold text-indigo-700">{event.title}</CardTitle>
@@ -104,7 +124,7 @@ export default async function Home() {
                   </Link>
                 </CardFooter>
               </Card>
-            ))}
+            ))} */}
           </div>
         </section>
 
@@ -112,6 +132,11 @@ export default async function Home() {
           <section className="mb-16">
             <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Featured Event Details</h2>
             <h1>Event Details</h1>
+            <div className="grid md:grid-cols-3 gap-8">
+              {allEvents.map((event) => (
+                <EventDetails key={event._id as string} event={event} />
+              ))}
+            </div>
           </section>
         )}
       </main>

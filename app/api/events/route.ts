@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Event from "@/models/events";
 import dbConnect from "@/lib/db";
+import { getSession } from "next-auth/react";
 export const POST = async (req: NextRequest, res: Response) => {
+    const session = await getSession();
+    console.log(session?.user)
+
     await dbConnect();
     const body = await req.json();
     const { title, description, startDate, endDate, startTime, endTime, venue } = body;
@@ -17,4 +21,12 @@ export const POST = async (req: NextRequest, res: Response) => {
     })
     // Save the event data to your database
     return NextResponse.json({ message: "Event created successfully" });
+}
+
+
+export const GET = async (req: NextRequest, res: Response) => {
+    await dbConnect();
+    const events = await Event.find();
+    console.log(events);
+    return NextResponse.json(events);
 }
