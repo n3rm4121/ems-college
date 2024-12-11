@@ -9,11 +9,11 @@ export interface IEvent {
     startTime: string;
     endTime: string;
     venue: 'hall1' | 'hall2';
-    organizer_id: ObjectId;
+    organizer: string;
     status: 'pending' | 'approved' | 'draft';
 }
 
-export type EventFormData = Omit<IEvent, 'organizer_id' | 'status'>;
+export type EventFormData = Omit<IEvent, 'organizer' | 'status'>;
 
 export interface StepInfo {
     title: string;

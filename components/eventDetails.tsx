@@ -37,7 +37,7 @@ export function EventDetails({ event }: EventDetailsProps) {
             </div>
             <div className="flex items-center">
               <User className="mr-2 h-5 w-5 text-gray-400" />
-              <span>{event?.organizer_id?.toString()}</span>
+              <span>{event?.organizer}</span>
             </div>
           </div>
 

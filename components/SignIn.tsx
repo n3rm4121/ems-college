@@ -4,12 +4,12 @@ import { useState, ReactElement } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  Mail as MailIcon, 
-  Lock as LockIcon, 
-  UserPlus as UserPlusIcon, 
-  LogIn as LogInIcon, 
-  CheckCircle2 as CheckCircleIcon 
+import {
+  Mail as MailIcon,
+  Lock as LockIcon,
+  UserPlus as UserPlusIcon,
+  LogIn as LogInIcon,
+  CheckCircle2 as CheckCircleIcon
 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +21,7 @@ import Spinner from "@/components/Spinner";
 const AuthPage = () => {
   const toast = useToast();
   const router = useRouter();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -41,23 +41,23 @@ const AuthPage = () => {
       });
 
       if (res?.error) {
-        setError(type === 'signIn' 
-          ? "Invalid email or password" 
+        setError(type === 'signIn'
+          ? "Invalid email or password"
           : "Error creating account"
         );
       } else {
         if (type === 'signUp') {
-          toast.toast({ 
-            description: "Account created successfully!", 
-            variant: "default" 
+          toast.toast({
+            description: "Account created successfully!",
+            variant: "default"
           });
         }
         router.push(type === 'signIn' ? "/dashboard" : "/events");
       }
     } catch (error) {
       console.error("Authentication error:", error);
-      setError(type === 'signIn' 
-        ? "Error signing in" 
+      setError(type === 'signIn'
+        ? "Error signing in"
         : "Error creating account"
       );
     } finally {
@@ -72,7 +72,7 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -82,35 +82,35 @@ const AuthPage = () => {
           <h1 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-2">
             {isSignUp ? (
               <>
-                <UserPlusIcon size={28} className="text-green-500" /> 
+                <UserPlusIcon size={28} className="text-green-500" />
                 Create Account
               </>
             ) : (
               <>
-                <LogInIcon size={28} className="text-blue-500" /> 
+                <LogInIcon size={28} className="text-blue-500" />
                 Sign In
               </>
             )}
           </h1>
           <p className="text-gray-500 mt-2">
-            {isSignUp 
-              ? "Join our Event Management System" 
+            {isSignUp
+              ? "Join our Event Management System"
               : "Welcome back to EMS"}
           </p>
         </div>
 
-        <form 
+        <form
           onSubmit={(e) => {
             e.preventDefault();
             handleAuthentication(isSignUp ? 'signUp' : 'signIn');
-          }} 
+          }}
           className="space-y-4"
         >
           {loading && <Spinner />}
-          
+
           <div className="relative">
-            <Label 
-              htmlFor="email" 
+            <Label
+              htmlFor="email"
               className="flex items-center gap-2 text-gray-700 mb-1"
             >
               <MailIcon size={16} /> Email
@@ -127,8 +127,8 @@ const AuthPage = () => {
           </div>
 
           <div className="relative">
-            <Label 
-              htmlFor="password" 
+            <Label
+              htmlFor="password"
               className="flex items-center gap-2 text-gray-700 mb-1"
             >
               <LockIcon size={16} /> Password
@@ -145,7 +145,7 @@ const AuthPage = () => {
           </div>
 
           {error && (
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-red-500 text-sm text-center"
@@ -178,8 +178,8 @@ const AuthPage = () => {
               onClick={toggleAuthMode}
               className="text-blue-600 hover:underline focus:outline-none"
             >
-              {isSignUp 
-                ? "Already have an account? Sign In" 
+              {isSignUp
+                ? "Already have an account? Sign In"
                 : "Don't have an account? Sign Up"}
             </button>
           </div>

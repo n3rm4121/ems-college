@@ -1,4 +1,4 @@
-export default function EventStatistics() {
+export default function Admin() {
     return (
         <>
         </>
