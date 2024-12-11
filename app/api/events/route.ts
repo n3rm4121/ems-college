@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Event from "@/models/events";
 import dbConnect from "@/lib/db";
-import { getSession } from "next-auth/react";
 import { auth } from "@/auth";
 import User from "@/models/user";
 export const POST = async (req: NextRequest, res: Response) => {
