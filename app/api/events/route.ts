@@ -9,6 +9,7 @@ export const POST = async (req: NextRequest, res: Response) => {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const userEmail = session?.user?.email;
+    const userName = session?.user?.name;
 
 
     await dbConnect();

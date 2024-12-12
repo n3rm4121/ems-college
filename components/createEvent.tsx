@@ -9,8 +9,16 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Progress } from "@/components/ui/progress";
 import { useEventForm } from "@/hooks/useEventForm";
 
-export const CreateEvent: React.FC = () => {
+interface CreateEventProps {
+    onClose: () => void;
+}
+
+export const CreateEvent: React.FC<CreateEventProps> = ({ onClose }) => {
     const { formData, currentStep, updateFormData, nextStep, prevStep, isStepValid, submitForm } = useEventForm();
+    const handleSubmit = async () => {
+        await submitForm();
+        onClose();
+    }
 
     const renderFormFields = () => {
         const currentFields = EVENT_STEPS[currentStep].fields;
@@ -81,7 +89,7 @@ export const CreateEvent: React.FC = () => {
                     Previous
                 </Button>
                 {currentStep === EVENT_STEPS.length - 1 ? (
-                    <Button onClick={submitForm} disabled={!isStepValid()}>
+                    <Button onClick={handleSubmit} disabled={!isStepValid()}>
                         Submit
                     </Button>
                 ) : (

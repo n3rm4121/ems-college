@@ -3,13 +3,16 @@ import { Carousel } from "@/components/ui/carousel"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 import Link from "next/link"
-import { Search, Calendar, MapPin, Clock, ArrowRight } from 'lucide-react'
+import { Search, Calendar, MapPin, Clock, ArrowRight, Plus } from 'lucide-react'
 import { useEffect, useState } from "react"
 import axios from 'axios'
 import { EventDetailsDialog } from "@/components/eventDetails"
 import { ObjectId } from "mongoose"
 import UserProfile from "@/components/userProfile"
+import { CreateEvent } from "./createEvent"
+import { useSession } from "next-auth/react"
 
 const eventCategories = [
   { name: 'Academic', icon: '🎓', color: 'bg-blue-500' },
@@ -18,26 +21,29 @@ const eventCategories = [
   { name: 'Technology', icon: '💻', color: 'bg-red-500' },
 ]
 
+interface Event {
+  _id: ObjectId;
+  title: string;
+  startDate: string;
+  startTime: string;
+  venue: string;
+  images: string[];
+  description: string;
+  endDate: string;
+  endTime: string;
+  featured: boolean;
+  status: "pending" | "approved";
+  organizer: string;
+}
 export default function ShowEvents() {
-  interface Event {
-    _id: ObjectId;
-    title: string;
-    startDate: string;
-    startTime: string;
-    venue: string;
-    images: string[];
-    description: string;
-    endDate: string;
-    endTime: string;
-    featured: boolean;
-    status: "pending" | "approved";
-  }
-
   const [allEvents, setAllEvents] = useState<Event[]>([]);
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [featuredEvents, setFeaturedEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isCreateEventDialogOpen, setIsCreateEventDialogOpen] = useState(false);
+  const { data: session } = useSession();
+
   useEffect(() => {
     const fetchAndProcessEvents = async () => {
       try {
@@ -56,10 +62,6 @@ export default function ShowEvents() {
           return eventStartDate <= now;
         });
 
-        console.log("All events:", events);
-        console.log("Upcoming events:", upcoming);
-        console.log("Featured events:", featured);
-
         setAllEvents(events);
         setUpcomingEvents(upcoming);
         setFeaturedEvents(featured);
@@ -72,14 +74,27 @@ export default function ShowEvents() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100 ">
-      <header className="bg-indigo-600 text-white shadow-lg relative overflow-visible mr-3 ml-3 ">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-center">College Event Management System</h1>
-          <UserProfile />
-          </div>
-      </header>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100">
+      <header className="bg-indigo-600 text-white shadow-lg relative overflow-visible mr-3 ml-3">
+        <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+          <h1 className="text-3xl font-bold">College Event Management System</h1>
 
+          <div className="flex items-center space-x-4">
+            <UserProfile />
+
+            <Dialog open={isCreateEventDialogOpen} onOpenChange={setIsCreateEventDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="secondary" className="flex items-center">
+                  <Plus className="mr-2 h-5 w-5" /> Create New Event
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[625px]">
+                <CreateEvent onClose={() => setIsCreateEventDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      </header>
 
       <main className="container mx-auto px-4 py-8">
         <section className="mb-16">
