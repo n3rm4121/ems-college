@@ -8,12 +8,12 @@ import Link from "next/link"
 import { Search, Calendar, MapPin, Clock, ArrowRight, Plus } from 'lucide-react'
 import { useEffect, useState } from "react"
 import axios from 'axios'
-import { EventDetailsDialog } from "@/components/eventDetails"
 import { ObjectId } from "mongoose"
 import UserProfile from "@/components/userProfile"
 import { CreateEvent } from "./createEvent"
 import { useSession } from "next-auth/react"
 import { redirect } from "next/navigation"
+import { EventDetailsDialog } from "./eventDetails"
 
 const eventCategories = [
   { name: 'Academic', icon: '🎓', color: 'bg-blue-500' },
@@ -63,7 +63,8 @@ export default function ShowEvents() {
           return eventStartDate <= now;
         });
 
-        setAllEvents(events);
+        // only set those events whose status is approved and start date is in the future
+        setAllEvents(events.filter((event: Event) => event.status === 'approved'));
         setUpcomingEvents(upcoming);
         setFeaturedEvents(featured);
       } catch (error) {
@@ -175,7 +176,6 @@ export default function ShowEvents() {
                     className="w-full bg-indigo-600 hover:bg-indigo-700"
                     onClick={() => {
                       setSelectedEvent(event);
-                      console.log("Selected event:", event);
                       setIsDialogOpen(true);
                     }}
                   >
@@ -188,7 +188,7 @@ export default function ShowEvents() {
         </section>
 
         <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Featured Events</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Past Events</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {featuredEvents.map((event) => (
               <Card key={event._id.toString()} className="hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
@@ -213,6 +213,8 @@ export default function ShowEvents() {
                   <Button
                     className="w-full bg-indigo-600 hover:bg-indigo-700"
                     onClick={() => {
+                      console.log("Opening dialog for event:", event);
+
                       setSelectedEvent(event);
                       setIsDialogOpen(true);
                     }}
@@ -233,4 +235,3 @@ export default function ShowEvents() {
     </div>
   )
 }
-

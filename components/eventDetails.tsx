@@ -8,6 +8,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { ObjectId } from "mongoose";
+import { useSession } from "next-auth/react";
 
 interface EventDetailsDialogProps {
   event: Event | null;
@@ -19,9 +20,7 @@ interface Event {
   _id: ObjectId;
   title: string;
   description: string;
-  images: string[];
   startDate: string;
-  endDate: string;
   startTime: string;
   endTime: string;
   venue: string;
@@ -30,18 +29,21 @@ interface Event {
 }
 
 export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialogProps) {
-  console.log("Events: ", event)
   const [attendees, setAttendees] = useState<string[]>([]);
   const [isFetching, setIsFetching] = useState(false);
-
+  const {data: session }  = useSession()
+  useEffect(() => {
+    console.log("Dialog isOpen:", isOpen, "Event:", event);
+  }, [isOpen, event]);
+  
   useEffect(() => {
     if (event) {
       const fetchAttendees = async () => {
         setIsFetching(true);
         try {
           const res = await axios.get(`http://localhost:3000/api/joinEvents?event_id=${event._id}`);
-          const iterate = new Array(res.data);
-          setAttendees(iterate.map((attendee: { id: string }) => attendee.id));
+          // console.log("Attendees: ", res.data.data.attendees);
+          setAttendees(res.data.data.attendees);
         } catch (error) {
           console.error("Failed to fetch attendees", error);
         } finally {
@@ -51,7 +53,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
 
       fetchAttendees();
     }
-  }, [event]);
+  }, [event, setAttendees]);
 
   const handleJoinEvent = async (event_id: string) => {
     try {
@@ -60,7 +62,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
 
       if (res.status === 201) {
         alert("User is successfully joined the event");
-        setAttendees((prev) => [...prev, "You"]);
+        setAttendees((prev) => [...prev, "session?.user?.email"]);
       }
     } catch (error) {
       console.error("Failed to join event", error);
@@ -71,19 +73,18 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
   if (!event) return null;
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="flex-grow px-6 relative">
           <div className="space-y-6">
-            <ImageCarousel images={event.images} />
             <div className="grid gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-indigo-600" />
                 <span className="text-gray-700">
-                  {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                  {new Date(event.startDate).toLocaleDateString()}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -120,11 +121,12 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
         <div className="p-6 pt-2 mt-4 mb-4">
           <Button
 
-            disabled={isFetching || attendees.includes("You")}
+            disabled={attendees.includes(session?.user?.email as string) || event.startDate < new Date().toISOString()}
             onClick={() => handleJoinEvent(event._id.toString())}
             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-          >
-            Join Event
+          >{
+             attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
+          }
           </Button>
           <Button onClick={onClose} className="mt-4 w-full bg-gray-600 hover:bg-gray-700 text-white">
             Close
