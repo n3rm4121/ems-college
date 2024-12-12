@@ -6,7 +6,7 @@ import { createUserInDb } from "./utils/createUserInDb";
 
 declare module "next-auth" {
   interface User {
-    role: "teacher" | "student";
+    role: "teacher" | "student" | "admin";
   }
 }
 
@@ -20,7 +20,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials, req) => {
         console.log("inside authorize callback");
-        
+
         if (!credentials) {
           throw new Error("Credentials are missing.");
         }

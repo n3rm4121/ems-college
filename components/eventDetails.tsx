@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Clock, Tag } from "lucide-react";
+import { Calendar, MapPin, Clock, Tag, User } from "lucide-react";
 import { ImageCarousel } from "./imagecarousel";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,6 +25,7 @@ interface Event {
   endTime: string;
   venue: string;
   status: "pending" | "approved";
+  organizer: string;
 }
 
 export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialogProps) {
@@ -57,7 +58,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
 
       if (res.status === 201) {
         alert("User is successfully joined the event");
-        setAttendees((prev) => [...prev, "You"]); 
+        setAttendees((prev) => [...prev, "You"]);
       }
     } catch (error) {
       console.error("Failed to join event", error);
@@ -100,11 +101,6 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
                 </span>
               </div>
             </div>
-<<<<<<< HEAD
-            <div className="flex flex-col space-y-4 p-4 rounded-md bg-indigo-50 bg-opacity-60 shadow-inner">
-              <h3 className="text-xl font-semibold text-indigo-800">Description</h3>
-              <p className="text-gray-800 leading-relaxed">{event.description}</p>
-=======
             <div className="flex items-center">
               <Clock className="mr-2 h-5 w-5 text-gray-400" />
               <span>{event.startTime} - {event.endTime}</span>
@@ -116,7 +112,6 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
             <div className="flex items-center">
               <User className="mr-2 h-5 w-5 text-gray-400" />
               <span>{event?.organizer}</span>
->>>>>>> 9c9ffaf7137b1fd6cc6415f92413f0e0d6dcd6fb
             </div>
           </div>
         </ScrollArea>
