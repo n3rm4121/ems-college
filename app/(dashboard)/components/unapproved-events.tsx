@@ -42,7 +42,7 @@ export function UnapprovedEvents() {
                 {unapprovedEvents.map((event: IEvent) => (
                     <TableRow key={event._id?.toString()}>
                         <TableCell>{event.title}</TableCell>
-                        <TableCell>{event.organizer_id as unknown as string}</TableCell>
+                        <TableCell>{event.organizer as unknown as string}</TableCell>
                         <TableCell>{event.startDate.toString()}</TableCell>
                         <TableCell>{event.endDate.toString()}</TableCell>
                         <TableCell>{event.startTime}</TableCell>

@@ -10,7 +10,7 @@ export interface IEvent extends Document {
     endTime: string;
     venue: "hall1" | "hall2";
     featured: boolean;
-    organizer_id?: ObjectId;
+    organizer: string;
     status: "pending" | "approved";
 }
 
@@ -24,7 +24,7 @@ const EventSchema: Schema<IEvent> = new Schema<IEvent>({
     endTime: { type: String, required: true },
     featured: { type: Boolean, default: false },
     venue: { type: String, enum: ["hall1", "hall2"], required: true },
-    organizer_id: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    organizer: { type: String, required: true },
     status: { type: String, enum: ["pending", "approved"], default: "pending" },
 });
 

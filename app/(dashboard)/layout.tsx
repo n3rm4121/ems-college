@@ -9,7 +9,7 @@ import { UnapprovedEvents } from "./components/unapproved-events"
 import { UserManagement } from "./components/user-management"
 import { Settings } from "./components/settings"
 import { Analytics } from "./components/analytics"
-import { AllEvents } from "./components/all-events"
+import AllEvents from "./components/all-events"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [activeComponent, setActiveComponent] = useState("Dashboard")
@@ -18,8 +18,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         switch (activeComponent) {
             case "Dashboard":
                 return <Dashboard />
-            case "UnapprovedEvents":
-                return <UnapprovedEvents />
             case "AllEvents":
                 return <AllEvents />
             case "UserManagement":

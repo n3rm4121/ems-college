@@ -4,14 +4,14 @@ export interface IUser extends mongoose.Document {
     name: string;
     email: string;
     password: string;
-    role: string;
+    role: "teacher" | "student" | "admin";
 }
 
 const UserSchema = new mongoose.Schema({
     name: { type: String , required: true },
     email: { type: String, required: true , unique: true },
     password: { type: String, required: true },
-    role: { type: String ,  enum: ['teacher', 'student']},
+    role: { type: String, enum: ["teacher", "student", "admin"] },
 });
 
 const User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);

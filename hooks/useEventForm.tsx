@@ -11,7 +11,8 @@ const initialFormData: EventFormData = {
     endDate: new Date(),
     startTime: "",
     endTime: "",
-    venue: "hall1",
+    venue: "",
+    images: [],
 };
 
 export const useEventForm = () => {
