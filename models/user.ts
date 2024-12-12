@@ -8,8 +8,8 @@ export interface IUser extends mongoose.Document {
 }
 
 const UserSchema = new mongoose.Schema({
-    name: { type: String },
-    email: { type: String, required: true },
+    name: { type: String , required: true },
+    email: { type: String, required: true , unique: true },
     password: { type: String, required: true },
     role: { type: String ,  enum: ['teacher', 'student']},
 });

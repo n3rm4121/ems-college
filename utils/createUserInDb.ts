@@ -1,28 +1,37 @@
 import dbConnect from "@/lib/db";
-import User from "@/models/user"; // Adjust the path based on your project structure
+import User,{IUser} from "@/models/user";
 
 interface UserInput {
+  name: Object;
   email: string;
   password: string;
-  role?: "teacher" | "student"; // Optional to allow flexibility
+  role?: "teacher" | "student";
 }
 
-export const createUserInDb = async (userInput: UserInput) => {
+export const createUserInDb = async (userInput: UserInput) :Promise<IUser>=> {
   await dbConnect();
-  console.log("inside createUserInDb");
-  const { email, password, role = "student" } = userInput; // Default role is "student"
+  const {name, email, password, role = "student" } = userInput;
 
-  console.log(userInput);
+  // Check for duplicate account
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw new Error("User with this email already exists");
+  }
 
   // Create and save the new user
-  const newUser = new User({
-    email,
-    password, // Password should be hashed before passing here
-    role,
-  });
-
-  await newUser.save();
-  console.log("New User:", newUser);
-
-  return newUser;
+  try {
+    const newUser = new User({
+      name,
+      email,
+      password, // Ensure password is hashed before saving
+      role,
+    });
+    await newUser.save();
+    return newUser;
+  } catch (error) {
+    if ((error as any).code === 11000) {
+      throw new Error("User with this email already exists");
+    }
+    throw error;
+  }
 };

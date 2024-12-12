@@ -9,7 +9,8 @@ import {
   Lock as LockIcon, 
   UserPlus as UserPlusIcon, 
   LogIn as LogInIcon, 
-  CheckCircle2 as CheckCircleIcon 
+  CheckCircle2 as CheckCircleIcon,
+  User as UserIcon 
 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -24,50 +25,60 @@ const AuthPage = () => {
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(""); // Add username state
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-
   const handleAuthentication = async (type: 'signIn' | 'signUp') => {
     setLoading(true);
     setError(null);
-
+  
     try {
       const res = await signIn("credentials", {
         redirect: false,
         email,
         password,
-        authType: type
+        ...(type === 'signUp' ? { name: username } : {}), // Add name only for sign-up
+        authType: type, // Ensure authType is being sent
       });
-
+  
       if (res?.error) {
-        setError(type === 'signIn' 
-          ? "Invalid email or password" 
-          : "Error creating account"
+        // Display more detailed error message based on the response
+        setError(
+          res.error === "User with this email already exists"
+            ? "An account with this email already exists"
+            : res.error === "Invalid credentials"
+              ? "Invalid email or password"
+              : "Error creating account"
         );
       } else {
+        // After successful authentication, redirect to appropriate page
         if (type === 'signUp') {
-          toast.toast({ 
-            description: "Account created successfully!", 
-            variant: "default" 
+          toast.toast({
+            description: "Account created successfully!",
+            variant: "default",
           });
         }
         router.push(type === 'signIn' ? "/dashboard" : "/events");
       }
     } catch (error) {
       console.error("Authentication error:", error);
-      setError(type === 'signIn' 
-        ? "Error signing in" 
+      setError(type === 'signIn'
+        ? "Error signing in"
         : "Error creating account"
       );
     } finally {
       setLoading(false);
     }
   };
+  
+
 
   const toggleAuthMode = () => {
     setIsSignUp(!isSignUp);
     setError(null);
+    // Reset username when switching modes
+    setUsername("");
   };
 
   return (
@@ -108,6 +119,27 @@ const AuthPage = () => {
         >
           {loading && <Spinner />}
           
+          {/* Add username field only for signup */}
+          {isSignUp && (
+            <div className="relative">
+              <Label 
+                htmlFor="username" 
+                className="flex items-center gap-2 text-gray-700 mb-1"
+              >
+                <UserIcon size={16} /> Username
+              </Label>
+              <Input
+                type="text"
+                id="username"
+                placeholder="Choose a username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="pl-10 py-3 border-gray-300 focus:border-blue-500 transition-all"
+                required
+              />
+            </div>
+          )}
+
           <div className="relative">
             <Label 
               htmlFor="email" 
