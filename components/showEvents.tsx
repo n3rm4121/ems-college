@@ -76,12 +76,12 @@ export default function ShowEvents() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-indigo-100">
       <header className="bg-indigo-600 text-white shadow-lg relative overflow-visible mr-3 ml-3">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <h1 className="text-3xl font-bold">College Event Management System</h1>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center mr-16">
             <UserProfile />
 
             <Button onClick={() => redirect('/create')}>Create Event</Button>
@@ -105,49 +105,6 @@ export default function ShowEvents() {
           </Carousel>
         </section>
 
-        <section className="mb-16">
-          <div className="max-w-4xl mx-auto px-4">
-            <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Find Your Next Event</h2>
-            <div className="relative w-full">
-              <div className="flex items-center shadow-2xl rounded-full bg-white overflow-hidden">
-                <div className="absolute left-6 text-gray-400">
-                  <Search className="h-6 w-6" />
-                </div>
-                <Input
-                  placeholder="Search events by title, category, or venue..."
-                  className="pl-14 pr-6 py-6 text-lg border-0 focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-grow"
-                />
-                <Button
-                  className="
-            absolute right-2 top-1/2 transform -translate-y-1/2 
-            px-6 py-3 rounded-full 
-            bg-indigo-600 hover:bg-indigo-700 
-            transition-all duration-300 ease-in-out
-          "
-                >
-                  Search
-                </Button>
-              </div>
-
-            </div>
-          </div>
-        </section>
-
-        <section className="mb-16">
-          <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Event Categories</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {eventCategories.map((category) => (
-              <Card key={category.name} className={`text-center hover:shadow-xl transition-shadow overflow-hidden group ${category.color}`}>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-6xl group-hover:scale-110 transition-transform">{category.icon}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-semibold text-white">{category.name}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
 
         <section className="mb-16">
           <h2 className="text-3xl font-bold mb-8 text-center text-indigo-800">Upcoming Events</h2>

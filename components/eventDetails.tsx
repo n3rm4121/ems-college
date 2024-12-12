@@ -78,13 +78,13 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="flex-grow px-6 relative">
+        <ScrollArea className="flex-grow px-6 relative mt-6">
           <div className="space-y-6">
             <div className="grid gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-indigo-600" />
                 <span className="text-gray-700">
-                  {new Date(event.startDate).toLocaleDateString()}
+                  {new Date(event.startDate).toDateString()}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -93,10 +93,11 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
                   {event.startTime} - {event.endTime}
                 </span>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-indigo-600" />
-                <span className="text-gray-700">{event.venue}</span>
-              </div>
+              <div className="flex items-center">
+              <MapPin className="mr-2 h-5 w-5 text-gray-400" />
+              <span className="text-gray-700 capitalize">
+                Venue: {event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</span>
+            </div>
               <div className="flex items-center gap-2">
                 <Tag className="h-5 w-5 text-indigo-600" />
                 <span className="text-gray-700 capitalize">
@@ -105,16 +106,17 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
               </div>
             </div>
             <div className="flex items-center">
-              <Clock className="mr-2 h-5 w-5 text-gray-400" />
-              <span>{event.startTime} - {event.endTime}</span>
-            </div>
-            <div className="flex items-center">
-              <MapPin className="mr-2 h-5 w-5 text-gray-400" />
-              <span>{event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</span>
-            </div>
-            <div className="flex items-center">
               <User className="mr-2 h-5 w-5 text-gray-400" />
-              <span>{event?.organizer}</span>
+              <span className="text-gray-700 capitalize">
+                Event Organizer: {event?.organizer}</span>
+            </div>
+            <div className="flex flex-col gap-4 border-t border-gray-200 pt-4">
+              <h3 className="text-lg font-semibold text-indigo-800">Description</h3>
+              <div className="flex flex-wrap items-start gap-4 text-gray-700">
+                <p className="flex-1 text-justify">
+                  {event.description}
+                </p>
+              </div>
             </div>
           </div>
         </ScrollArea>
