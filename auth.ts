@@ -6,7 +6,7 @@ import { createUserInDb } from "./utils/createUserInDb";
 
 declare module "next-auth" {
   interface User {
-    role: "teacher" | "student";
+    role: "teacher" | "student" | "admin"
   }
 }
 
@@ -29,7 +29,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid credentials format.");
         }
 
-        let role: "teacher" | "student";
+        let role: "teacher" | "student" | "admin";
         if (email.endsWith("@khec.edu.np")) {
           if (/^[a-zA-Z]+(\.[a-zA-Z]+)?@khec\.edu\.np$/.test(email)) {
             role = "teacher";

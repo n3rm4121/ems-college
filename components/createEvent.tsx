@@ -68,7 +68,7 @@ export const CreateEvent: React.FC = () => {
     };
 
     return (
-        <Card className="w-full max-w-lg mx-auto">
+        <Card className="w-full max-w-lg border-none mx-auto">
             <CardHeader>
                 <CardTitle>{EVENT_STEPS[currentStep].title}</CardTitle>
             </CardHeader>

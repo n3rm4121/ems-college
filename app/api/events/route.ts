@@ -5,18 +5,15 @@ import { auth } from "@/auth";
 import User from "@/models/user";
 export const POST = async (req: NextRequest, res: Response) => {
     const session = await auth();
-
-    const userEmail = session?.user?.email;
-    if (!userEmail) {
+    if (!session) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+    const userEmail = session?.user?.email;
+
 
     await dbConnect();
     const body = await req.json();
     const { title, description, startDate, endDate, startTime, endTime, venue } = body;
-    // get user name from email
-    const organizer = await User.findOne({ email: userEmail })
-    console.log("Organizer from create event api: ", organizer)
     console.log("Received event data:", title, description, startDate, endDate, startTime, endTime, venue);
     await Event.create({
         title,
@@ -26,7 +23,7 @@ export const POST = async (req: NextRequest, res: Response) => {
         startTime,
         endTime,
         venue,
-        organizer: organizer.email
+        organizer: userEmail
     })
     // Save the event data to your database
     return NextResponse.json({ message: "Event created successfully" });
@@ -36,6 +33,67 @@ export const POST = async (req: NextRequest, res: Response) => {
 export const GET = async (req: NextRequest, res: Response) => {
     await dbConnect();
     const events = await Event.find();
-    console.log(events);
+    console.log("events: ", events);
     return NextResponse.json(events);
 }
+
+export const PUT = async (req: NextRequest, res: Response) => {
+    // update the incomming event data
+    await dbConnect();
+    const session = await auth();
+    if (!session) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const userEmail = session?.user?.email;
+    const isAdmin = session.user?.role === "admin";
+
+    const body = await req.json();
+    const { updatePayload } = body;
+    console.log("body ko: ", updatePayload)
+    if (!isAdmin && updatePayload.organizer !== userEmail) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const event = await Event.findById(updatePayload._id as string);
+    if (!event) {
+        return NextResponse.json({ message: "Event not found" }, { status: 404 });
+    }
+
+    const updatedEvent = await Event
+        .findByIdAndUpdate(updatePayload._id as string, {
+            title: updatePayload.title,
+            description: updatePayload.description,
+            startDate: updatePayload.startDate,
+            endDate: updatePayload.endDate,
+            startTime: updatePayload.startTime,
+            endTime: updatePayload.endTime,
+            venue: updatePayload.venue,
+            status: updatePayload.status,
+        });
+    return NextResponse.json({ data: updatedEvent });
+}
+
+
+export const DELETE = async (req: NextRequest, res: Response) => {
+    await dbConnect();
+    const session = await auth();
+    if (!session) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const userEmail = session?.user?.email;
+    const isAdmin = session.user?.role === "admin";
+    // get eventId from query param
+    const searchParams = req.nextUrl.searchParams;
+    const eventId = searchParams.get("eventId");
+    const event = await Event.findById(eventId);
+    if (!event) {
+        return NextResponse.json({ message: "Event not found" }, { status: 404 });
+    }
+    if (event.organizer !== userEmail && !isAdmin) {
+        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    await Event.findByIdAndDelete(eventId);
+    return NextResponse.json({ message: "Event deleted successfully" });
+}
+

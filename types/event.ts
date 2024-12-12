@@ -1,16 +1,18 @@
 import { ObjectId } from "mongoose";
 
 export interface IEvent {
-    _id?: ObjectId;
+    _id?: string;
     title: string;
     description: string;
     startDate: Date;
     endDate: Date;
     startTime: string;
     endTime: string;
-    venue: 'hall1' | 'hall2';
+    venue: string;
     organizer: string;
     status: 'pending' | 'approved' | 'draft';
+    images: string[];
+    featured?: boolean;
 }
 
 export type EventFormData = Omit<IEvent, 'organizer' | 'status'>;

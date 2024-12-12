@@ -23,11 +23,6 @@ const items = [
         component: "Dashboard"
     },
     {
-        title: "Unapproved Events",
-        icon: FileCheck,
-        component: "UnapprovedEvents"
-    },
-    {
         title: "All Events",
         icon: Calendar,
         component: "AllEvents"

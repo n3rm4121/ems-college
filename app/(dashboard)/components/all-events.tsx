@@ -1,43 +1,56 @@
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+'use client'
+import EventList from "./EventList"
+import { useEffect, useState } from "react"
+import axios from 'axios'
+import { IEvent } from "@/types/event"
+import { Toaster } from "@/components/ui/toaster"
 
-const allEvents = [
-    { id: 1, name: "Tech Symposium", organizer: "CS Department", date: "2024-05-15", status: "Approved" },
-    { id: 2, name: "Annual Sports Meet", organizer: "Sports Club", date: "2024-06-10", status: "Pending" },
-    { id: 3, name: "Cultural Night", organizer: "Arts Society", date: "2024-07-22", status: "Approved" },
-    { id: 4, name: "Career Fair", organizer: "Career Services", date: "2024-08-05", status: "Approved" },
-    { id: 5, name: "Alumni Meetup", organizer: "Alumni Association", date: "2024-09-15", status: "Pending" },
-]
+export default function EventsPage() {
+    const [events, setEvents] = useState<IEvent[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
-export function AllEvents() {
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                setIsLoading(true)
+                const response = await axios.get('http://localhost:3000/api/events')
+                setEvents(response.data)
+            } catch (error) {
+                console.error("Failed to fetch events:", error)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        fetchEvents()
+    }, [])
+
+    const handleUpdateEvents = (updatedEvent: IEvent) => {
+        setEvents(currentEvents =>
+            currentEvents.map(event =>
+                event._id === updatedEvent._id ? updatedEvent : event
+            )
+        )
+    }
+
+    const handleDeleteEvent = (eventId: string) => {
+        setEvents(currentEvents =>
+            currentEvents.filter(event => event._id !== eventId)
+        )
+    }
+
+    if (isLoading) {
+        return <div>Loading events...</div>
+    }
+
     return (
-        <div className="space-y-6">
-            <h1 className="text-3xl font-bold">All Events</h1>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Event Name</TableHead>
-                        <TableHead>Organizer</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {allEvents.map((event) => (
-                        <TableRow key={event.id}>
-                            <TableCell>{event.name}</TableCell>
-                            <TableCell>{event.organizer}</TableCell>
-                            <TableCell>{event.date}</TableCell>
-                            <TableCell>{event.status}</TableCell>
-                            <TableCell>
-                                <Button variant="outline" size="sm">Edit</Button>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+        <div className="container mx-auto p-4">
+            <h1 className="text-2xl font-bold mb-4">Event Management</h1>
+            <EventList
+                events={events}
+                onUpdateEvents={handleUpdateEvents}
+                onDeleteEvent={handleDeleteEvent}
+            />
+            <Toaster />
         </div>
     )
 }
-
