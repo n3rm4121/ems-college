@@ -18,9 +18,9 @@ const UserProfile = () => {
               <AvatarFallback>JP</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-36 bg-white shadow-lg rounded-md">
+          <DropdownMenuContent className="w-full bg-white shadow-lg rounded-md">
             <DropdownMenuItem>
-              <div className="font-semibold text-gray-800 px-4 py-2">John Doe</div>
+              <div className="font-semibold text-gray-800 px-4 py-2">{session?.user?.name}({session?.user?.email})</div>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
@@ -36,7 +36,7 @@ const UserProfile = () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </div >
     ) : (
       <Button onClick={() => redirect('/auth/signin')} variant="outline" className="text-black">
         Login
