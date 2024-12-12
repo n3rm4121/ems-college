@@ -4,7 +4,6 @@ import { useState, ReactElement } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-<<<<<<< HEAD
 import { 
   Mail as MailIcon, 
   Lock as LockIcon, 
@@ -12,14 +11,6 @@ import {
   LogIn as LogInIcon, 
   CheckCircle2 as CheckCircleIcon,
   User as UserIcon 
-=======
-import {
-  Mail as MailIcon,
-  Lock as LockIcon,
-  UserPlus as UserPlusIcon,
-  LogIn as LogInIcon,
-  CheckCircle2 as CheckCircleIcon
->>>>>>> 9c9ffaf7137b1fd6cc6415f92413f0e0d6dcd6fb
 } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -31,66 +22,56 @@ import Spinner from "@/components/Spinner";
 const AuthPage = () => {
   const toast = useToast();
   const router = useRouter();
-
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState(""); // Add username state
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
-  const handleAuthentication = async (type: 'signIn' | 'signUp') => {
-    setLoading(true);
-    setError(null);
-  
-    try {
-      const res = await signIn("credentials", {
-        redirect: false,
-        email,
-        password,
-        ...(type === 'signUp' ? { name: username } : {}), // Add name only for sign-up
-        authType: type, // Ensure authType is being sent
-      });
-  
-      if (res?.error) {
-<<<<<<< HEAD
-        // Display more detailed error message based on the response
-        setError(
-          res.error === "User with this email already exists"
-            ? "An account with this email already exists"
-            : res.error === "Invalid credentials"
-              ? "Invalid email or password"
-              : "Error creating account"
-=======
-        setError(type === 'signIn'
-          ? "Invalid email or password"
-          : "Error creating account"
->>>>>>> 9c9ffaf7137b1fd6cc6415f92413f0e0d6dcd6fb
-        );
-      } else {
-        // After successful authentication, redirect to appropriate page
-        if (type === 'signUp') {
-          toast.toast({
-            description: "Account created successfully!",
-<<<<<<< HEAD
-            variant: "default",
-=======
-            variant: "default"
->>>>>>> 9c9ffaf7137b1fd6cc6415f92413f0e0d6dcd6fb
-          });
-        }
-        router.push(type === 'signIn' ? "/dashboard" : "/events");
-      }
-    } catch (error) {
-      console.error("Authentication error:", error);
-      setError(type === 'signIn'
-        ? "Error signing in"
-        : "Error creating account"
+const handleAuthentication = async (type: 'signIn' | 'signUp') => {
+  setLoading(true);
+  setError(null);
+
+  try {
+    const res = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+      ...(type === 'signUp' ? { name: username } : {}), // Add name only for sign-up
+      authType: type, // Ensure authType is being sent
+    });
+
+    if (res?.error) {
+      // Display more detailed error message based on the response
+      setError(
+        res.error === "User with this email already exists"
+          ? "An account with this email already exists"
+          : res.error === "Invalid credentials"
+            ? "Invalid email or password"
+            : "Error creating account"
       );
-    } finally {
-      setLoading(false);
+    } else {
+      // After successful authentication, redirect to appropriate page
+      if (type === 'signUp') {
+        toast.toast({
+          description: "Account created successfully!",
+          variant: "default",
+        });
+      }
+      router.push(type === 'signIn' ? "/dashboard" : "/events");
     }
-  };
-  
+  } catch (error) {
+    console.error("Authentication error:", error);
+    setError(type === 'signIn'
+      ? "Error signing in"
+      : "Error creating account"
+    );
+  } finally {
+    setLoading(false);
+  }
+};
+
 
 
   const toggleAuthMode = () => {
@@ -102,7 +83,7 @@ const AuthPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center p-4">
-      <motion.div
+      <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -112,32 +93,31 @@ const AuthPage = () => {
           <h1 className="text-3xl font-bold text-gray-800 flex items-center justify-center gap-2">
             {isSignUp ? (
               <>
-                <UserPlusIcon size={28} className="text-green-500" />
+                <UserPlusIcon size={28} className="text-green-500" /> 
                 Create Account
               </>
             ) : (
               <>
-                <LogInIcon size={28} className="text-blue-500" />
+                <LogInIcon size={28} className="text-blue-500" /> 
                 Sign In
               </>
             )}
           </h1>
           <p className="text-gray-500 mt-2">
-            {isSignUp
-              ? "Join our Event Management System"
+            {isSignUp 
+              ? "Join our Event Management System" 
               : "Welcome back to EMS"}
           </p>
         </div>
 
-        <form
+        <form 
           onSubmit={(e) => {
             e.preventDefault();
             handleAuthentication(isSignUp ? 'signUp' : 'signIn');
-          }}
+          }} 
           className="space-y-4"
         >
           {loading && <Spinner />}
-<<<<<<< HEAD
           
           {/* Add username field only for signup */}
           {isSignUp && (
@@ -159,12 +139,10 @@ const AuthPage = () => {
               />
             </div>
           )}
-=======
->>>>>>> 9c9ffaf7137b1fd6cc6415f92413f0e0d6dcd6fb
 
           <div className="relative">
-            <Label
-              htmlFor="email"
+            <Label 
+              htmlFor="email" 
               className="flex items-center gap-2 text-gray-700 mb-1"
             >
               <MailIcon size={16} /> Email
@@ -181,8 +159,8 @@ const AuthPage = () => {
           </div>
 
           <div className="relative">
-            <Label
-              htmlFor="password"
+            <Label 
+              htmlFor="password" 
               className="flex items-center gap-2 text-gray-700 mb-1"
             >
               <LockIcon size={16} /> Password
@@ -199,7 +177,7 @@ const AuthPage = () => {
           </div>
 
           {error && (
-            <motion.p
+            <motion.p 
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-red-500 text-sm text-center"
@@ -232,8 +210,8 @@ const AuthPage = () => {
               onClick={toggleAuthMode}
               className="text-blue-600 hover:underline focus:outline-none"
             >
-              {isSignUp
-                ? "Already have an account? Sign In"
+              {isSignUp 
+                ? "Already have an account? Sign In" 
                 : "Don't have an account? Sign Up"}
             </button>
           </div>

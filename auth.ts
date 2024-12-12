@@ -6,7 +6,7 @@ import { createUserInDb } from "./utils/createUserInDb";
 
 declare module "next-auth" {
   interface User {
-    role: "teacher" | "student" | "admin"
+    role: "teacher" | "student";
   }
 }
 
@@ -14,7 +14,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     CredentialsProvider({
       credentials: {
-        name: { label: "Name", type: "text" }, 
+        name: { label: "Name", type: "text" }, // 
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
@@ -31,20 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new Error("Invalid credentials format.");
         }
 
-<<<<<<< HEAD
         if (!email.endsWith("@khec.edu.np")) {
-=======
-        let role: "teacher" | "student" | "admin";
-        if (email.endsWith("@khec.edu.np")) {
-          if (/^[a-zA-Z]+(\.[a-zA-Z]+)?@khec\.edu\.np$/.test(email)) {
-            role = "teacher";
-          } else if (/^\d+@khec\.edu\.np$/.test(email)) {
-            role = "student";
-          } else {
-            throw new Error("Invalid email format for role assignment.");
-          }
-        } else {
->>>>>>> 9c9ffaf7137b1fd6cc6415f92413f0e0d6dcd6fb
           throw new Error("Email must be a @khec.edu.np domain.");
         }
 
