@@ -6,8 +6,8 @@ export const EVENT_STEPS: StepInfo[] = [
         fields: ["title", "description"],
     },
     {
-        title: "Date and Time",
-        fields: ["startDate", "endDate", "startTime", "endTime"],
+        title: "Date & Time",
+        fields: ["date", "startTime", "endTime"],
     },
     {
         title: "Venue",

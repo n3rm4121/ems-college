@@ -8,6 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useEventForm } from "@/hooks/useEventForm";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from 'lucide-react';
+import { format } from "date-fns";
 
 interface CreateEventProps {
     onClose: () => void;
@@ -15,6 +19,7 @@ interface CreateEventProps {
 
 export const CreateEvent: React.FC<CreateEventProps> = ({ onClose }) => {
     const { formData, currentStep, updateFormData, nextStep, prevStep, isStepValid, submitForm } = useEventForm();
+
     const handleSubmit = async () => {
         await submitForm();
         onClose();
@@ -25,12 +30,10 @@ export const CreateEvent: React.FC<CreateEventProps> = ({ onClose }) => {
         return currentFields.map((field) => {
             switch (field) {
                 case "title":
-                case "startTime":
-                case "endTime":
                     return (
                         <Input
                             key={field}
-                            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                            placeholder="Event Title"
                             value={formData[field]}
                             onChange={(e) => updateFormData(field, e.target.value)}
                             className="mb-4"
@@ -46,16 +49,49 @@ export const CreateEvent: React.FC<CreateEventProps> = ({ onClose }) => {
                             className="mb-4"
                         />
                     );
-                case "startDate":
-                case "endDate":
+                case "date":
                     return (
-                        <Input
-                            key={field}
-                            type="date"
-                            value={formData[field].toISOString().split('T')[0]}
-                            onChange={(e) => updateFormData(field, new Date(e.target.value))}
-                            className="mb-4"
-                        />
+                        <Popover key={field}>
+                            <PopoverTrigger asChild>
+                                <Button
+                                    variant={"outline"}
+                                    className={`w-full justify-start text-left font-normal mb-4 ${!formData.date && "text-muted-foreground"
+                                        }`}
+                                >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                    mode="single"
+                                    selected={formData.date}
+                                    onSelect={(date) => updateFormData("date", date)}
+                                    initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    );
+                case "startTime":
+                case "endTime":
+                    return (
+                        <div key={field} className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {field === "startTime" ? "Start Time" : "End Time"}
+                            </label>
+                            <Select onValueChange={(value) => updateFormData(field, value)}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Select time" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Array.from({ length: 11 }, (_, i) => i + 7).map((hour) => (
+                                        <SelectItem key={hour} value={`${hour.toString().padStart(2, '0')}:00`}>
+                                            {`${hour === 12 ? 12 : hour % 12}:00 ${hour < 12 ? 'AM' : 'PM'}`}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     );
                 case "venue":
                     return (

@@ -7,8 +7,7 @@ import axios from 'axios'
 const initialFormData: EventFormData = {
     title: "",
     description: "",
-    startDate: new Date(),
-    endDate: new Date(),
+    date: new Date(),
     startTime: "",
     endTime: "",
     venue: "",
@@ -41,10 +40,8 @@ export const useEventForm = () => {
     };
 
     const submitForm = async () => {
-        // Here you would typically send the formData to your API
         console.log("Submitting form data:", formData);
         await axios.post('http://localhost:3000/api/events', formData)
-        // Implement your API call here
     };
 
     return {

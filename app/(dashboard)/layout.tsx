@@ -3,13 +3,13 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
 import { useState } from 'react'
-import { Dashboard } from "./components/dashboard"
 import { UnapprovedEvents } from "./components/unapproved-events"
 
 import { UserManagement } from "./components/user-management"
 import { Settings } from "./components/settings"
 import { Analytics } from "./components/analytics"
 import AllEvents from "./components/all-events"
+import Dashboard from "./components/dashboard"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
     const [activeComponent, setActiveComponent] = useState("Dashboard")

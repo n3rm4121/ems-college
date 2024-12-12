@@ -9,7 +9,7 @@ import { NextApiRequest } from "next";
 export async function POST(req: Request) {
     await dbConnect();
 
-    const session  = await auth();
+    const session = await auth();
     if (!session) {
         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     try {
         const body = await req.json();
-        const {event_id}  = body;
+        const { event_id } = body;
         console.log('event_id from post joinEvents', event_id);
 
         if (!event_id) {
@@ -27,16 +27,16 @@ export async function POST(req: Request) {
         // convert event_id to ObjectId
         const ObjectId = require('mongodb').ObjectId;
         const documentAlreadyExists = await JoinEvent.findById(event_id);
-        if(!documentAlreadyExists) {
+        if (!documentAlreadyExists) {
             console.log("aaile samma bane xaina so banaudai", event_id)
             const newDocument = await JoinEvent.create({
                 event_id: event_id,
                 attendees: [userEmail]
             })
             console.log(
-                "new joined ", newDocument   
+                "new joined ", newDocument
             )
-        }else{
+        } else {
             console.log("bane sakexa", event_id)
             const join = await JoinEvent.findOneAndUpdate(
                 { event_id },
@@ -44,8 +44,8 @@ export async function POST(req: Request) {
                 { new: true, upsert: true }
             );
         }
-        
-        return NextResponse.json({ success: true}, { status: 201 });
+
+        return NextResponse.json({ success: true }, { status: 201 });
     } catch (error) {
         console.log('error: ', error)
         return NextResponse.json({ success: false, error: (error as Error).message }, { status: 400 });
@@ -90,9 +90,9 @@ export async function GET(req: Request) {
 
         const attendees = await JoinEvent.findOne({ event_id }).populate("attendees");
 
-        if (!attendees) {
-            return NextResponse.json({ message: "No attendees found for this event" }, { status: 404 });
-        }
+        // if (!attendees) {
+        //     return NextResponse.json({ message: "No attendees found for this event" }, { status: 404 });
+        // }
 
         return NextResponse.json({ success: true, data: attendees }, { status: 200 });
     } catch (error) {

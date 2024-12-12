@@ -1,10 +1,8 @@
-import { auth } from '@/auth';
+'use client'
 import ShowEvents from '@/components/showEvents';
 import React from 'react';
 
-async function Home() {
-  const session = await auth();
-  console.log(session?.user);
+function Home() {
   return (
     <ShowEvents />
   );

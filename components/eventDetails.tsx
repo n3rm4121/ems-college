@@ -1,3 +1,4 @@
+'use client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Clock, Tag, User } from "lucide-react";
@@ -10,8 +11,8 @@ import { ObjectId } from "mongoose";
 
 interface EventDetailsDialogProps {
   event: Event | null;
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 interface Event {
@@ -39,7 +40,8 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
         setIsFetching(true);
         try {
           const res = await axios.get(`http://localhost:3000/api/joinEvents?event_id=${event._id}`);
-          setAttendees(res.data.map((attendee: { id: string }) => attendee.id));
+          const iterate = new Array(res.data);
+          setAttendees(iterate.map((attendee: { id: string }) => attendee.id));
         } catch (error) {
           console.error("Failed to fetch attendees", error);
         } finally {
@@ -69,7 +71,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
   if (!event) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog>
       <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
         <DialogHeader className="p-6 pb-2">
           <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>

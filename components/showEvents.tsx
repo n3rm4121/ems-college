@@ -13,6 +13,7 @@ import { ObjectId } from "mongoose"
 import UserProfile from "@/components/userProfile"
 import { CreateEvent } from "./createEvent"
 import { useSession } from "next-auth/react"
+import { redirect } from "next/navigation"
 
 const eventCategories = [
   { name: 'Academic', icon: '🎓', color: 'bg-blue-500' },
@@ -82,16 +83,7 @@ export default function ShowEvents() {
           <div className="flex items-center space-x-4">
             <UserProfile />
 
-            <Dialog open={isCreateEventDialogOpen} onOpenChange={setIsCreateEventDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="secondary" className="flex items-center">
-                  <Plus className="mr-2 h-5 w-5" /> Create New Event
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[625px]">
-                <CreateEvent onClose={() => setIsCreateEventDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
+            <Button onClick={() => redirect('/create')}>Create Event</Button>
           </div>
         </div>
       </header>
@@ -101,7 +93,7 @@ export default function ShowEvents() {
           <Carousel className="rounded-xl overflow-hidden shadow-2xl relative">
             {featuredEvents.map((event) => (
               <div key={event._id.toString()} className="relative h-[300px]">
-                <img src={event.images[0] || '/placeholder.svg?height=600&width=1200'} alt={event.title} className="w-full h-full object-cover" />
+                {/* <img src={event.images[0] || '/placeholder.svg?height=600&width=1200'} alt={event.title} className="w-full h-full object-cover" /> */}
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-8">
                   <h2 className="text-5xl font-bold text-white text-center mb-4">{event.title}</h2>
                   <p className="text-2xl text-white mb-8">{new Date(event.startDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
