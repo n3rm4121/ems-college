@@ -1,57 +1,3 @@
-// import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { UnapprovedEvents } from "./unapproved-events"
-// import { EventStatistics } from "./event-statistics"
-// import { RecentActivity } from "./recent-activity"
-// import { UserManagement } from "./user-management"
-
-// export function Dashboard() {
-//     return (
-//         <div className="space-y-6">
-//             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-//             <div className="grid gap-6 md:grid-cols-2">
-//                 <Card>
-//                     <CardHeader>
-//                         <CardTitle>Unapproved Events</CardTitle>
-//                         <CardDescription>Events pending approval</CardDescription>
-//                     </CardHeader>
-//                     <CardContent>
-//                         <UnapprovedEvents />
-//                     </CardContent>
-//                 </Card>
-//                 <Card>
-//                     <CardHeader>
-//                         <CardTitle>Event Statistics</CardTitle>
-//                         <CardDescription>Overview of event data</CardDescription>
-//                     </CardHeader>
-//                     <CardContent>
-//                         <EventStatistics />
-//                     </CardContent>
-//                 </Card>
-//                 <Card>
-//                     <CardHeader>
-//                         <CardTitle>User Management</CardTitle>
-//                         <CardDescription>Manage students and teachers</CardDescription>
-//                     </CardHeader>
-//                     <CardContent>
-//                         <UserManagement />
-//                     </CardContent>
-//                 </Card>
-//                 <Card>
-//                     <CardHeader>
-//                         <CardTitle>Recent Activity</CardTitle>
-//                         <CardDescription>Latest actions and events</CardDescription>
-//                     </CardHeader>
-//                     <CardContent>
-//                         <RecentActivity />
-//                     </CardContent>
-//                 </Card>
-//             </div>
-//         </div>
-//     )
-// }
-
-
-
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -63,8 +9,8 @@ import { CreateEventForm } from "./create-event-form";
 import { Toaster } from "@/components/ui/toaster";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import EventModal from "./EventModal";
 import { EventDetailsDialog } from "@/components/eventDetails";
+import UserProfile from "@/components/userProfile";
 
 const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
@@ -74,7 +20,9 @@ const getFirstDayOfMonth = (year, month) => {
     return new Date(year, month, 1).getDay();
 };
 
-export default function Dashboard() {
+export default function Calendar() {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [selectedTime, setSelectedTime] = useState(null);
@@ -85,19 +33,27 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const timelineRef = useRef(null);
 
+    const handleEventClick = (event) => {
+        setSelectedEvent(event);
+        setIsDialogOpen(true);
+    };
+
     useEffect(() => {
         const fetchEvents = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('http://localhost:3000/api/events');
+                const response = await fetch('/api/events');
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
                 const data = await response.json();
-                setEvents(data.map(event => ({
+                const processedEvents = data.map(event => ({
                     ...event,
-                    startDate: new Date(event.startDate)
-                })));
+                    startDate: new Date(event.startDate),
+                    color: event.color || `bg-${['blue', 'green', 'purple', 'red', 'yellow', 'indigo'][Math.floor(Math.random() * 6)]}-500`
+                }));
+                setEvents(processedEvents);
+                console.log('Fetched events:', processedEvents);
             } catch (error) {
                 console.error('Error fetching events:', error);
             } finally {
@@ -106,9 +62,6 @@ export default function Dashboard() {
         };
         fetchEvents();
     }, []);
-    console.log(events);
-
-
 
     const daysInMonth = getDaysInMonth(currentDate.getFullYear(), currentDate.getMonth());
     const firstDayOfMonth = getFirstDayOfMonth(currentDate.getFullYear(), currentDate.getMonth());
@@ -124,13 +77,13 @@ export default function Dashboard() {
     };
 
     const getEventsForDate = (date) => {
-        return events
-            .filter(event =>
-                event.startDate.getDate() === date.getDate() &&
-                event.startDate.getMonth() === date.getMonth() &&
-                event.startDate.getFullYear() === date.getFullYear()
-            )
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const filteredEvents = events.filter(event =>
+            event.startDate.getFullYear() === date.getFullYear() &&
+            event.startDate.getMonth() === date.getMonth() &&
+            event.startDate.getDate() === date.getDate()
+        ).sort((a, b) => a.startTime.localeCompare(b.startTime));
+        console.log('Filtered events for', date.toDateString(), ':', filteredEvents);
+        return filteredEvents;
     };
 
     const handleDateClick = (day) => {
@@ -164,14 +117,14 @@ export default function Dashboard() {
     const scrollToEvent = (event) => {
         if (timelineRef.current) {
             const startHour = parseInt(event.startTime.split(':')[0]);
-            const scrollPosition = startHour * 60;
+            const scrollPosition = Math.max(0, (startHour - 7) * 60);
             timelineRef.current.scrollTop = scrollPosition;
         }
     };
 
     const handleCreateEvent = async (newEvent) => {
         try {
-            const response = await fetch('http://localhost:3000/api/events', {
+            const response = await fetch('/api/events', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -185,7 +138,11 @@ export default function Dashboard() {
 
             const createdEvent = await response.json();
             setEvents(prevEvents => {
-                const updatedEvents = [...prevEvents, { ...createdEvent, startDate: new Date(createdEvent.startDate) }];
+                const updatedEvents = [...prevEvents, {
+                    ...createdEvent,
+                    startDate: new Date(createdEvent.startDate),
+                    color: createdEvent.color || `bg-${['blue', 'green', 'purple', 'red', 'yellow', 'indigo'][Math.floor(Math.random() * 6)]}-500`
+                }];
                 return updatedEvents.sort((a, b) => {
                     const dateA = new Date(`${a.startDate.toDateString()} ${a.startTime}`);
                     const dateB = new Date(`${b.startDate.toDateString()} ${b.startTime}`);
@@ -203,15 +160,16 @@ export default function Dashboard() {
     if (isLoading) {
         return <div>Loading...</div>;
     }
+
     return (
-        <div className="flex h-screen bg-[#1C1C1C] text-white">
+        <div className="flex h-screen">
             {/* Left sidebar */}
             <div className="w-[300px] border-r border-gray-800 p-4 overflow-y-auto">
                 <div className="relative mb-6">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
                     <Input
                         placeholder="Search events"
-                        className="pl-10 bg-[#2C2C2C] border-none"
+                        className="pl-10 "
                         value={searchTerm}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
@@ -256,14 +214,6 @@ export default function Dashboard() {
                                 >
                                     {day}
                                 </Button>
-                                {selectedDate.getDate() === day &&
-                                    selectedDate.getMonth() === currentDate.getMonth() &&
-                                    selectedDate.getFullYear() === currentDate.getFullYear() &&
-                                    selectedTime && (
-                                        <div className="absolute top-full left-0 z-10 bg-blue-600 text-white text-xs p-1 rounded">
-                                            {selectedTime}
-                                        </div>
-                                    )}
                             </div>
                         );
                     })}
@@ -278,7 +228,7 @@ export default function Dashboard() {
                                 .map(event => (
                                     <div
                                         key={event._id}
-                                        className="p-2 rounded bg-[#2C2C2C] cursor-pointer hover:bg-[#3C3C3C]"
+                                        className="p-2 rounded cursor-pointer bg-secondary"
                                         onClick={() => {
                                             setSelectedDate(event.startDate);
                                             setCurrentDate(new Date(event.startDate));
@@ -290,7 +240,6 @@ export default function Dashboard() {
                                             {event.venue} - {event.startDate.toLocaleDateString()}
                                         </div>
                                     </div>
-
                                 ))}
                         </div>
                     </ScrollArea>
@@ -310,10 +259,6 @@ export default function Dashboard() {
                         <Button variant="outline" size="icon" className="text-gray-400" onClick={() => navigateDay(1)}>
                             <ChevronRight className="h-4 w-4" />
                         </Button>
-                        {/* <Button onClick={() => setShowCreateEventForm(true)}>
-                            <Plus className="h-4 w-4 mr-2" />
-                            Create Event
-                        </Button> */}
                         <Dialog>
                             <DialogTrigger asChild><Button>Create New Event</Button></DialogTrigger>
                             <DialogContent>
@@ -323,89 +268,79 @@ export default function Dashboard() {
                                     existingEvents={events}
                                     selectedDate={selectedDate}
                                 />
-
                             </DialogContent>
                         </Dialog>
+                        <UserProfile />
                     </div>
                 </div>
 
-                {/* {showCreateEventForm && (
-                    <div className="mb-4">
-                        <CreateEventForm
-                            onCreateEvent={handleCreateEvent}
-                            onClose={() => setShowCreateEventForm(false)}
-                            existingEvents={events}
-                            selectedDate={selectedDate}
-                        />
-                    </div>
-                )} */}
-
-                <div className="flex-1 overflow-y-auto bg-[#2C2C2C] rounded-lg p-4" ref={timelineRef}>
-                    <div className="min-h-[100vh]">
-                        {Array.from({ length: 24 }).map((_, hour) => (
-                            <div key={hour} className="relative h-[60px] border-t border-gray-700">
-                                <span className="absolute -top-3 -left-4 text-xs text-gray-400">
-                                    {hour.toString().padStart(2, '0')}:00
-                                </span>
-                                {getEventsForDate(selectedDate)
-                                    .filter(event => {
-                                        const startHour = parseInt(event.startTime.split(':')[0]);
-                                        const endHour = parseInt(event.endTime.split(':')[0]);
-                                        return startHour <= hour && endHour > hour;
-                                    })
-                                    .map(event => {
-                                        const startHour = parseInt(event.startTime.split(':')[0]);
-                                        const startMinute = parseInt(event.startTime.split(':')[1]);
-                                        const endHour = parseInt(event.endTime.split(':')[0]);
-                                        const endMinute = parseInt(event.endTime.split(':')[1]);
-                                        const top = (startHour === hour ? startMinute : 0) * (60 / 60);
-                                        const height = ((endHour - startHour) * 60 + endMinute - startMinute) * (60 / 60);
-                                        return (
-                                            <Dialog>
-
-                                                <DialogTrigger asChild>
-                                                    <div
-                                                        key={event._id}
-                                                        className={`absolute left-16 right-4 rounded p-2 ${event.color} text-white overflow-hidden`}
-                                                        style={{
-                                                            top: `${top}px`,
-                                                            height: `${height}px`,
-                                                            zIndex: startHour === hour ? 10 : 5,
-                                                        }}
-
-                                                    >
-
-                                                        <div className="font-semibold">{event.title}</div>
-                                                        <div className="text-sm">
-                                                            {event.startTime} - {event.endTime}
-                                                        </div>
-                                                        <div className="text-xs">{event.venue}</div>
-                                                        {event.description && (
-                                                            <div className="text-xs mt-1 overflow-hidden text-ellipsis whitespace-nowrap">
-                                                                {event.description}
-                                                            </div>
-                                                        )}
+                <div className="flex-1 overflow-y-auto rounded-lg p-4" ref={timelineRef}>
+                    <div className="min-h-[660px]"> {/* 11 hours * 60 px per hour */}
+                        {Array.from({ length: 12 }).map((_, index) => {
+                            const hour = index + 7; // Start from 7 AM
+                            return (
+                                <div key={hour} className="relative h-[60px] border-t border-gray-700">
+                                    <span className="absolute -top-3 -left-4 text-xs text-gray-400">
+                                        {hour.toString().padStart(2, '0')}:00
+                                    </span>
+                                    {getEventsForDate(selectedDate)
+                                        .filter(event => {
+                                            const startHour = parseInt(event.startTime.split(':')[0]);
+                                            const endHour = parseInt(event.endTime.split(':')[0]);
+                                            const shouldDisplay = startHour <= hour && endHour > hour;
+                                            console.log(`Event ${event.title} at hour ${hour}: ${shouldDisplay ? 'displayed' : 'not displayed'}`);
+                                            return shouldDisplay;
+                                        })
+                                        .map(event => {
+                                            const startHour = parseInt(event.startTime.split(':')[0]);
+                                            const startMinute = parseInt(event.startTime.split(':')[1]);
+                                            const endHour = parseInt(event.endTime.split(':')[0]);
+                                            const endMinute = parseInt(event.endTime.split(':')[1]);
+                                            const top = Math.max(0, (startHour - 7) * 60 + startMinute);
+                                            const height = Math.min(660, ((endHour - startHour) * 60 + endMinute - startMinute));
+                                            return (
+                                                <div
+                                                    key={event._id}
+                                                    onClick={() => handleEventClick(event)}
+                                                    className={`absolute left-16 right-4 rounded p-2 ${event.color} border-2 border-green-500 overflow-hidden cursor-pointer`}
+                                                    style={{
+                                                        top: `${top}px`,
+                                                        height: `${height}px`,
+                                                        zIndex: startHour === hour ? 10 : 5,
+                                                    }}
+                                                >
+                                                    <div className="font-semibold">{event.title}</div>
+                                                    <div className="text-sm">
+                                                        {event.startTime} - {event.endTime}
                                                     </div>
-                                                </DialogTrigger>
-                                                <DialogContent>
-                                                    <EventDetailsDialog event={event}
-
-                                                    />
-
-                                                </DialogContent>
-                                            </Dialog>
-
-                                        );
-                                    })}
-                            </div>
-                        ))}
+                                                    <div className="text-xs">{event.venue}</div>
+                                                    {event.description && (
+                                                        <div className="text-xs mt-1 overflow-hidden text-ellipsis whitespace-nowrap">
+                                                            {event.description}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
+            {/* Event Details Dialog */}
+            {selectedEvent && (
+                <EventDetailsDialog
+                    event={selectedEvent}
+                    isOpen={isDialogOpen}
+                    onClose={() => {
+                        setIsDialogOpen(false);
+                        setSelectedEvent(null);
+                    }}
+                />
+            )}
             <Toaster />
-        </div >
+        </div>
     );
 }
-
-
 

@@ -45,7 +45,6 @@ export default function EventModal({ event, onClose, onUpdate, onDelete }: Event
             const updatePayload = {
                 ...editedEvent,
                 startDate: new Date(editedEvent.startDate),
-                endDate: new Date(editedEvent.endDate)
             }
 
             const updatedEvent = await axios.put(`http://localhost:3000/api/events/`, { updatePayload }).then(res => res.data)
@@ -157,18 +156,6 @@ export default function EventModal({ event, onClose, onUpdate, onDelete }: Event
                                 name="startDate"
                                 type="date"
                                 value={new Date(editedEvent.startDate).toISOString().split('T')[0]}
-                                onChange={handleInputChange}
-                                className="col-span-3 border-gray-300 focus:ring-2 focus:ring-blue-500"
-                                disabled={!isEditing}
-                            />
-                        </div>
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <label htmlFor="endDate" className="text-right font-medium text-gray-700">End Date</label>
-                            <Input
-                                id="endDate"
-                                name="endDate"
-                                type="date"
-                                value={new Date(editedEvent.endDate).toISOString().split('T')[0]}
                                 onChange={handleInputChange}
                                 className="col-span-3 border-gray-300 focus:ring-2 focus:ring-blue-500"
                                 disabled={!isEditing}

@@ -49,12 +49,7 @@ export function AppSidebar({ setActiveComponent, activeComponent }: { setActiveC
         <Sidebar>
             <SidebarContent>
                 <SidebarGroup>
-                    <Dialog>
-                        <DialogTrigger asChild><Button>Create New Event</Button></DialogTrigger>
-                        <DialogContent>
-                            <CreateEvent />
-                        </DialogContent>
-                    </Dialog>
+                    
                     <SidebarGroupLabel>Admin Dashboard</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>

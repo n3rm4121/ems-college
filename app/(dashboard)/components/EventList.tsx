@@ -5,6 +5,7 @@ import { IEvent } from "@/types/event"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import EventModal from "./EventModal"
+import { Calendar, Timer } from "lucide-react"
 
 interface EventListProps {
     events: IEvent[]
@@ -74,9 +75,14 @@ function EventCard({ event, onSelect }: { event: IEvent; onSelect: (event: IEven
             </CardHeader>
             <CardContent>
                 <p className="text-sm text-gray-500 mb-2">
-                    {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
+                    <Calendar className="inline-block size-4 text-center mr-2" />{new Date(event.startDate).toDateString()}
                 </p>
-                <p className="text-sm mb-4">{event.description.substring(0, 100)}...</p>
+                <p className="text-sm text-gray-500 mb-2">
+                    <Timer className="inline-block size-4 text-center mr-2" />{event.startTime} - {event.endTime}
+                </p>
+                <p className="text-sm mb-4">
+
+                    <span className="text-md text-gray-500 mb-2">Description: </span>{event.description.substring(0, 100)}...</p>
                 <Button onClick={() => onSelect(event)}>View Details</Button>
             </CardContent>
         </Card>
