@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { EventDetailsDialog } from "@/components/eventDetails"
 import { redirect } from "next/navigation"
 import axios from "axios"
+import Spinner from "@/components/Spinner"
 
 interface Event {
   _id: string;
@@ -64,6 +65,7 @@ const MyEvents = () => {
           throw new Error('Failed to fetch joined events');
         }
         const data = await response.json();
+        console.log(data.joinedEvents);
         setJoinedEvents(data.joinedEvents);
       } catch (err) {
         setError((err as Error).message);
@@ -86,7 +88,7 @@ const MyEvents = () => {
   };
 
   if (loading) {
-    return <LoadingSkeleton />;
+    return <Spinner />;
   }
 
   if (error) {
@@ -125,10 +127,16 @@ const MyEvents = () => {
             animate="visible"
           >
             {joinedEvents.map((event, index) => (
-              <motion.div key={event._id} variants={itemVariants} custom={index}>
-                <EventCard event={event.event_id} onViewDetails={() => handleOpenDialog(event)} />
-              </motion.div>
+              event.event_id ? (
+                <motion.div key={event._id} variants={itemVariants} custom={index}>
+                  <EventCard event={event.event_id} onViewDetails={() => handleOpenDialog(event)} />
+                </motion.div>) : (
+                <EmptyState />
+
+              )
+
             ))}
+
           </motion.div>
         )}
       </motion.div>
@@ -167,7 +175,7 @@ const MyEvents = () => {
   );
 };
 
-const EventCard = ({ event, onViewDetails }: { event: Event; onViewDetails: () => void }) => (
+const EventCard = ({ event, onViewDetails }) => (
   console.log('event', event),
 
   <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">

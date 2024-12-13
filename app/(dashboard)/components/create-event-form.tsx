@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useSession } from 'next-auth/react';
+import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/hooks/use-toast';
 
 const VENUES = ['Hall 1', 'Hall 2', 'Hall 3', 'Conference Room', 'Meeting Room A', 'Meeting Room B'];
 
@@ -22,6 +24,7 @@ export function CreateEventForm({ onCreateEvent, onClose, existingEvents, select
   const [venue, setVenue] = useState('');
   const [description, setDescription] = useState('');
   const { data: session } = useSession();
+  const { toast } = useToast();
 
   const isVenueAvailable = (selectedVenue: string, selectedStart: string, selectedEnd: string) => {
     return !existingEvents.some(event =>
@@ -46,8 +49,14 @@ export function CreateEventForm({ onCreateEvent, onClose, existingEvents, select
         color: `bg-${['blue', 'green', 'purple', 'red', 'yellow', 'indigo'][Math.floor(Math.random() * 6)]}-500`,
       };
       onCreateEvent(newEvent);
+      onClose();
     } else {
-      alert('The selected venue is not available at this time. Please choose a different venue or time.');
+      toast({
+        title: 'Venue not available',
+        description: 'The selected venue is not available at this time. Please choose a different venue or time.',
+        variant: 'destructive'
+      })
+
     }
   };
   const generateTimeOptions = () => {
@@ -66,56 +75,59 @@ export function CreateEventForm({ onCreateEvent, onClose, existingEvents, select
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-transparent p-4 rounded-lg">
-      <h1 className='text-2xl font-bold'>Create Event</h1>
-      <div>
-        <Label htmlFor="title">Event Title</Label>
-        <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required={true} />
-      </div>
-      <div>
-        <Label htmlFor="startTime">Start Time</Label>
-        <Select value={startTime} onValueChange={setStartTime}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select start time" />
-          </SelectTrigger>
-          <SelectContent>
-            {generateTimeOptions()}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="endTime">End Time</Label>
-        <Select value={endTime} onValueChange={setEndTime}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select end time" />
-          </SelectTrigger>
-          <SelectContent>
-            {generateTimeOptions()}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="venue">Venue</Label>
-        <Select onValueChange={setVenue} required={true}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a venue" />
-          </SelectTrigger>
-          <SelectContent>
-            {VENUES.map((v) => (
-              <SelectItem key={v} value={v}>{v}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label htmlFor="description">Description</Label>
-        <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
-      </div>
-      <div className="flex justify-end space-x-2">
-        <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-        <Button type="submit">Create Event</Button>
-      </div>
-    </form>
+    <>
+      <form onSubmit={handleSubmit} className="space-y-4 bg-transparent p-4 rounded-lg">
+        <h1 className='text-2xl font-bold'>Create Event</h1>
+        <div>
+          <Label htmlFor="title">Event Title</Label>
+          <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required={true} />
+        </div>
+        <div>
+          <Label htmlFor="startTime">Start Time</Label>
+          <Select value={startTime} onValueChange={setStartTime}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select start time" />
+            </SelectTrigger>
+            <SelectContent>
+              {generateTimeOptions()}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="endTime">End Time</Label>
+          <Select value={endTime} onValueChange={setEndTime}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select end time" />
+            </SelectTrigger>
+            <SelectContent>
+              {generateTimeOptions()}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="venue">Venue</Label>
+          <Select onValueChange={setVenue} required={true}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a venue" />
+            </SelectTrigger>
+            <SelectContent>
+              {VENUES.map((v) => (
+                <SelectItem key={v} value={v}>{v}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="description">Description</Label>
+          <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="flex justify-end space-x-2">
+          <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
+          <Button type="submit">Create Event</Button>
+        </div>
+      </form>
+      <Toaster />
+    </>
   );
 }
 

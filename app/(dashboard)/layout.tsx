@@ -2,9 +2,7 @@
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
-import { useState } from 'react'
-import { UnapprovedEvents } from "./components/unapproved-events"
-
+import { useState, useEffect } from 'react'
 import { UserManagement } from "./components/user-management"
 import { Settings } from "./components/settings"
 import { Analytics } from "./components/analytics"
@@ -12,11 +10,20 @@ import AllEvents from "./components/all-events"
 import Dashboard from "./components/dashboard"
 import { useSession } from "next-auth/react"
 import Unauthorized from "./components/unauthorized"
+import Spinner from "@/components/Spinner"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-    const { data: session } = useSession();
+    const { data: session, status } = useSession();
+    const [isLoading, setIsLoading] = useState(true);
+    const [activeComponent, setActiveComponent] = useState("Dashboard");
+
     const isAdmin = session?.user?.role === "admin";
-    const [activeComponent, setActiveComponent] = useState("Dashboard")
+
+    useEffect(() => {
+        if (status !== "loading") {
+            setIsLoading(false);
+        }
+    }, [status]);
 
     const renderComponent = () => {
         switch (activeComponent) {
@@ -33,6 +40,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             default:
                 return <Dashboard />
         }
+    }
+
+    if (isLoading) {
+        return (
+            <Spinner />
+        );
     }
 
     return (
@@ -54,4 +67,4 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             )}
         </>
     )
-}    
+}

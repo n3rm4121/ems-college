@@ -3,7 +3,9 @@ import JoinEvent from "@/models/joinEvents";
 import dbConnect from "@/lib/db";
 import { auth } from "@/auth";
 import { NextApiRequest } from "next";
+import mongoose from "mongoose";
 
+const { ObjectId } = require('mongodb');
 
 // POST: Add an attendee to an event
 export async function POST(req: Request) {
@@ -20,17 +22,17 @@ export async function POST(req: Request) {
         const { event_id } = body;
         console.log('event_id from post joinEvents', event_id);
 
-        if (!event_id) {
-            return NextResponse.json({ message: "Missing event_id" }, { status: 400 });
-        }
+        // if (!event_id) {
+        //     return NextResponse.json({ message: "Missing event_id" }, { status: 400 });
+        // }
 
         // convert event_id to ObjectId
-        const ObjectId = require('mongodb').ObjectId;
-        const documentAlreadyExists = await JoinEvent.findById(event_id);
+        const objectIdEventId = new ObjectId(event_id);
+        const documentAlreadyExists = await JoinEvent.findOne({ event_id: objectIdEventId });
         if (!documentAlreadyExists) {
             console.log("aaile samma bane xaina so banaudai", event_id)
             const newDocument = await JoinEvent.create({
-                event_id: event_id,
+                event_id: objectIdEventId,
                 attendees: [userEmail]
             })
             console.log(
@@ -51,6 +53,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: false, error: (error as Error).message }, { status: 400 });
     }
 }
+
 
 // DELETE: Withdraw from an event
 export async function DELETE(req: Request) {

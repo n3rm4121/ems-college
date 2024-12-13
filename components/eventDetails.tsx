@@ -12,11 +12,13 @@ import { useSession } from "next-auth/react";
 import { Toaster } from "./ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
+import { Separator } from "./ui/separator";
 
 interface EventDetailsDialogProps {
   event: Event | null;
   isOpen?: boolean;
   onClose?: () => void;
+  onJoin?: () => void;
 }
 
 interface Event {
@@ -31,8 +33,19 @@ interface Event {
   organizer: string;
 }
 
-export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialogProps) {
-  console.log('event dialgo: ', event)
+export function EventDetailsDialog({
+  event,
+  isOpen,
+  onClose,
+  onApprove,
+  onDelete,
+  onJoin,
+
+}: EventDetailsDialogProps & {
+  onApprove?: () => void,
+  onDelete?: () => void,
+  onJoin?: () => void
+}) {
   const { toast } = useToast();
   const [attendees, setAttendees] = useState<string[]>([]);
   const [isFetching, setIsFetching] = useState(false);
@@ -61,79 +74,103 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
     }
   }, [event, setAttendees]);
 
-  const handleJoinEvent = async (event_id: string) => {
-    try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents`, { event_id });
-      console.log("JoinEvent created", res.data);
+  // const handleJoinEvent = async (event_id: string) => {
+  //   try {
+  //     const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents`, { event_id });
+  //     console.log("JoinEvent created", res.data);
 
-      if (res.status === 201) {
-        toast({
-          title: "Event Joined",
-          description: `You have successfully joined the event "${event?.title}".`,
-        });
-        setAttendees((prev) => [...prev, "session?.user?.email"]);
-      }
-    } catch (error) {
-      console.error("Failed to join event", error);
-      toast({
-        title: "Join Event Failed",
-        description: "There was an error joining the event.",
-        variant: "destructive",
-      });
-    }
-  };
+  //     if (res.status === 201) {
+  //       toast({
+  //         title: "Event Joined",
+  //         description: `You have successfully joined the event "${event?.title}".`,
+  //       });
+  //       setAttendees((prev) => [...prev, "session?.user?.email"]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to join event", error);
+  //     toast({
+  //       title: "Join Event Failed",
+  //       description: "There was an error joining the event.",
+  //       variant: "destructive",
+  //     });
+  //   }
+  // };
 
   if (!event) return null;
 
+  // const handleDelete = async () => {
+  //   try {
+  //     const eventId = event._id
+  //     await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/events?eventId=${eventId}`)
+  //     toast({
+  //       title: "Event Deleted",
+  //       description: `Event "${event.title}" has been permanently deleted.`,
+  //       variant: "destructive"
+  //     })
+  //   } catch (error) {
+  //     console.error("Failed to delete event:", error)
+  //     toast({
+  //       title: "Deletion Failed",
+  //       description: "There was an error deleting the event.",
+  //       variant: "destructive"
+  //     })
+  //   }
+  // }
+
+  // const handleApprove = async () => {
+  //   try {
+  //     const updatePayload = {
+  //       ...event,
+  //       status: event.status === 'pending' ? 'approved' : 'pending'
+  //     }
+
+  //     const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/events/approve`, { updatePayload }).then(res => res.data)
+  //     console.log("Updated Event:", updatedEvent)
+
+  //     toast({
+  //       title: "Event Status Changed",
+  //       description: `Event "${updatedEvent.data.title}" status changed to ${updatedEvent.data.status}.`,
+  //       variant: "default"
+  //     })
+  //   } catch (error) {
+  //     console.error("Failed to change event status:", error)
+  //     toast({
+  //       title: "Status Change Failed",
+  //       description: "There was an error changing the event status.",
+  //       variant: "destructive"
+  //     })
+  //   }
+  // }
+
   const handleDelete = async () => {
     try {
-      const eventId = event._id
-      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/events?eventId=${eventId}`)
-      toast({
-        title: "Event Deleted",
-        description: `Event "${event.title}" has been permanently deleted.`,
-        variant: "destructive"
-      })
+      await onDelete?.()
     } catch (error) {
       console.error("Failed to delete event:", error)
-      toast({
-        title: "Deletion Failed",
-        description: "There was an error deleting the event.",
-        variant: "destructive"
-      })
     }
   }
 
   const handleApprove = async () => {
     try {
-      const updatePayload = {
-        ...event,
-        status: event.status === 'pending' ? 'approved' : 'pending'
-      }
-
-      const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/events/approve`, { updatePayload }).then(res => res.data)
-      console.log("Updated Event:", updatedEvent)
-
-      toast({
-        title: "Event Status Changed",
-        description: `Event "${updatedEvent.data.title}" status changed to ${updatedEvent.data.status}.`,
-        variant: "default"
-      })
+      await onApprove?.()
     } catch (error) {
       console.error("Failed to change event status:", error)
-      toast({
-        title: "Status Change Failed",
-        description: "There was an error changing the event status.",
-        variant: "destructive"
-      })
     }
   }
 
+  const handleJoinEvent = async (event_id: string) => {
+    try {
+      await onJoin?.()
+    } catch (error) {
+      console.log("Failed to join event", error);
+      console.error("Failed to join event", error);
+    }
+  }
   return (
     <>
 
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="md:min-w-[700px] md:min-h-[90vh] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <DialogContent className="md:min-w-[700px] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
           <DialogHeader className="p-6 pb-2">
             <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>
           </DialogHeader>
@@ -153,7 +190,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <MapPin className="mr-2 h-5 w-5 text-gray-400" />
+                  <MapPin className="mr-2 h-5 w-5  text-indigo-600" />
                   <span className="text-gray-700 capitalize">
                     Venue: {event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</span>
                 </div>
@@ -165,7 +202,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
                 </div>
               </div>
               <div className="flex items-center">
-                <User className="mr-2 h-5 w-5 text-gray-400" />
+                <User className="mr-2 h-5 w-5  text-indigo-600" />
                 <span className="text-gray-700 capitalize">
                   Event Organizer: {event?.organizer}</span>
               </div>
@@ -179,52 +216,54 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
               </div>
             </div>
           </ScrollArea>
-          <div className="flex flex-row gap-4 p-6 pt-0">
-            <Button
 
-              disabled={attendees.includes(session?.user?.email as string) || event.startDate < new Date().toISOString() || event.status === "pending"}
-              onClick={() => handleJoinEvent(event._id.toString())}
-            >{
-                attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
-              }
-            </Button>
-            <Button onClick={onClose}>
-              Close
-            </Button>
-            {isAdmin && (
-              <>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
+          <div>
+            <Separator className="mt-10 mb-2" />
+
+            <div className="flex flex-row gap-4 p-4">
+              <Button
+
+                disabled={attendees.includes(session?.user?.email as string) || event.status === "pending"}
+                onClick={() => handleJoinEvent(event._id.toString())}
+              >{
+                  attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
+                }
+              </Button>
+              {isAdmin && (
+                <>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        className="bg-red-600 hover:bg-red-700 text-white flex items-center"
+                      >
+                        <Trash2 className="mr-2" size={16} /> Delete Event
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This action cannot be undone. This will permanently delete the event.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                  {(event.status === "pending" || event.status === "approved") && (
                     <Button
-                      variant="destructive"
-                      className="bg-red-600 hover:bg-red-700 text-white flex items-center"
+                      onClick={handleApprove}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white"
                     >
-                      <Trash2 className="mr-2" size={16} /> Delete Event
+                      {event.status === 'pending' ? 'Approve Event' : 'Mark as Pending'}
                     </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the event.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-                {(event.status === "pending" || event.status === "approved") && (
-                  <Button
-                    onClick={handleApprove}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
-                  >
-                    {event.status === 'pending' ? 'Approve Event' : 'Mark as Pending'}
-                  </Button>
-                )}
-              </>
-            )}
+                  )}
+                </>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>

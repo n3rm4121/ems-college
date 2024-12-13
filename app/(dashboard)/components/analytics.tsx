@@ -1,5 +1,7 @@
 "use client"
 
+// TODO: Implement the Analytics component
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
