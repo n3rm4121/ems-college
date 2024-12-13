@@ -51,7 +51,7 @@ export default function Calendar() {
         const fetchEvents = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch('/api/events');
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch events');
                 }
@@ -133,7 +133,7 @@ export default function Calendar() {
 
     const handleCreateEvent = async (newEvent) => {
         try {
-            const response = await fetch('/api/events', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

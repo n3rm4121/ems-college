@@ -48,7 +48,7 @@ export default function ShowEvents() {
   useEffect(() => {
     const fetchAndProcessEvents = async () => {
       try {
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/events`);
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events`);
         const events: Event[] = res.data;
 
         console.log("Fetched events:", events);
