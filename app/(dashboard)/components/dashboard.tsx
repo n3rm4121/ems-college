@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventDetailsDialog } from "@/components/eventDetails";
 import UserProfile from "@/components/userProfile";
+import { useSession } from "next-auth/react";
 
 const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
@@ -32,6 +33,7 @@ export default function Calendar() {
     const [showCreateEventForm, setShowCreateEventForm] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const timelineRef = useRef(null);
+    const {data:session} = useSession();    
 
     const handleEventClick = (event) => {
         setSelectedEvent(event);
@@ -159,6 +161,10 @@ export default function Calendar() {
 
     if (isLoading) {
         return <div>Loading...</div>;
+    }
+    const isAdmin = session?.user?.role === 'admin';
+    if(!isAdmin){
+        return <div>Unauthorized</div>
     }
 
     return (
