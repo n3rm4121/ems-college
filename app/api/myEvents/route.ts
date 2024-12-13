@@ -24,9 +24,9 @@ export async function GET(req: Request) {
 
     console.log("joinedEvents", joinedEvents);
 
-    if (!joinedEvents.length) {
-        return NextResponse.json({ message: "No events found" }, { status: 404 });
-    }
+    // if (!joinedEvents.length) {
+    //     return NextResponse.json({ message: "No events found" }, { status: 404 });
+    // }
 
     return NextResponse.json({ joinedEvents }, { status: 200 });
 }

@@ -11,7 +11,7 @@ const UserProfile = () => {
 
   return (
     session ? (
-      <div className="absolute top-4 right-4 z-auto">
+      <div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
@@ -25,15 +25,15 @@ const UserProfile = () => {
                          focus:ring-opacity-50 
                          active:scale-95"
             >
-              <User 
+              <User
                 className="h-12 w-12 text-indigo-900 
                            transition-colors duration-300 
-                           group-hover:text-indigo-700" 
+                           group-hover:text-indigo-700"
               />
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent 
+          <DropdownMenuContent
             className="w-64 bg-white shadow-xl rounded-lg 
                        border border-gray-100 
                        animate-in slide-in-from-top-2 
@@ -59,8 +59,8 @@ const UserProfile = () => {
 
             {/* My Events Link */}
             <DropdownMenuItem asChild>
-              <Link 
-                href="/my-events" 
+              <Link
+                href="/my-events"
                 prefetch={false}
                 className="group flex items-center space-x-3 
                            px-3 py-2 
@@ -79,7 +79,7 @@ const UserProfile = () => {
 
             {/* Logout Button */}
             <DropdownMenuItem asChild>
-              <Button 
+              <Button
                 onClick={() => signOut()}
                 variant="ghost"
                 className="w-full flex items-center space-x-3 

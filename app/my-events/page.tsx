@@ -75,6 +75,9 @@ const MyEvents = () => {
     return <ErrorState error={error} />;
   }
 
+  if (joinedEvents.length === 0) {
+    return <EmptyState />;
+  }
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
@@ -96,7 +99,7 @@ const MyEvents = () => {
         {joinedEvents.length === 0 ? (
           <EmptyState />
         ) : (
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             variants={containerVariants}
             initial="hidden"
@@ -159,7 +162,7 @@ const EmptyState = () => (
     <h3 className="text-xl font-semibold mb-2">No Events Joined Yet</h3>
     <p className="text-muted-foreground mb-4">You haven't joined any events. Start exploring and join some exciting events!</p>
     <Button asChild>
-      <a href="/events">Explore Events</a>
+      <a href="/create">Explore Events</a>
     </Button>
   </Card>
 )
