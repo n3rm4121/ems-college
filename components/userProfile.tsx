@@ -26,7 +26,7 @@ const UserProfile = () => {
                          active:scale-95"
             >
               <User
-                className="h-12 w-12 text-indigo-900 
+                className="h-10 w-10 p-2 text-indigo-900 
                            transition-colors duration-300 
                            group-hover:text-indigo-700"
               />
@@ -34,14 +34,14 @@ const UserProfile = () => {
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
-            className="w-64 bg-white shadow-xl rounded-lg 
+            className="w-64 shadow-xl rounded-lg 
                        border border-gray-100 
                        animate-in slide-in-from-top-2 
                        ease-out duration-300"
           >
             {/* User Profile Section */}
             <DropdownMenuItem>
-              <div className="cursor-default hover:bg-transparent">
+              <div className="cursor-default">
                 <div className="flex items-center space-x-3 p-2">
                   <div>
                     <div className="font-bold text-gray-800">

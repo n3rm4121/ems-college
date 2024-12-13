@@ -281,17 +281,22 @@ export default function Calendar() {
 
             {/* Main calendar area */}
             <div className="flex-1 p-4 flex flex-col">
+                {/** Header */}
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl">
-                        {selectedDate.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
-                    </h2>
                     <div className="flex items-center gap-2">
+                        <h2 className="text-xl">
+                            {selectedDate.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
+                        </h2>
                         <Button variant="outline" size="icon" className="text-gray-400" onClick={() => navigateDay(-1)}>
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="icon" className="text-gray-400" onClick={() => navigateDay(1)}>
                             <ChevronRight className="h-4 w-4" />
                         </Button>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+
                         <Dialog>
                             <DialogTrigger asChild><Button
                                 className={!session?.user ? "opacity-50 cursor-not-allowed" : ""}
@@ -341,8 +346,8 @@ export default function Calendar() {
                                             const startMinute = parseInt(event.startTime.split(':')[1]);
                                             const endHour = parseInt(event.endTime.split(':')[0]);
                                             const endMinute = parseInt(event.endTime.split(':')[1]);
-                                            const top = Math.max(0, (startHour - 7) * 60 + startMinute);
-                                            const height = Math.min(660, ((endHour - startHour) * 60 + endMinute - startMinute));
+                                            const top = (startHour === hour ? startMinute : 0) * (60 / 60);
+                                            const height = ((endHour - startHour) * 60 + endMinute - startMinute) * (60 / 60);
                                             return (
                                                 <div
                                                     key={event._id}
