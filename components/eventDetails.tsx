@@ -51,6 +51,7 @@ export function EventDetailsDialog({
   const [isFetching, setIsFetching] = useState(false);
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === "admin";
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     console.log("Dialog isOpen:", isOpen, "Event:", event);
   }, [isOpen, event]);
@@ -74,27 +75,28 @@ export function EventDetailsDialog({
     }
   }, [event, setAttendees]);
 
-  // const handleJoinEvent = async (event_id: string) => {
-  //   try {
-  //     const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents`, { event_id });
-  //     console.log("JoinEvent created", res.data);
-
-  //     if (res.status === 201) {
-  //       toast({
-  //         title: "Event Joined",
-  //         description: `You have successfully joined the event "${event?.title}".`,
-  //       });
-  //       setAttendees((prev) => [...prev, "session?.user?.email"]);
-  //     }
-  //   } catch (error) {
-  //     console.error("Failed to join event", error);
-  //     toast({
-  //       title: "Join Event Failed",
-  //       description: "There was an error joining the event.",
-  //       variant: "destructive",
-  //     });
-  //   }
-  // };
+  const handleJoinEvent = async (event_id: string) => {
+    try {
+      setIsLoading(true);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents`, { event_id });
+      console.log("JoinEvent created", res.data);
+      setIsLoading(false);
+      if (res.status === 201) {
+        toast({
+          title: "Event Joined",
+          description: `You have successfully joined the event "${event?.title}".`,
+        });
+        setAttendees((prev) => [...prev, "session?.user?.email"]);
+      }
+    } catch (error) {
+      console.error("Failed to join event", error);
+      toast({
+        title: "Join Event Failed",
+        description: "There was an error joining the event.",
+        variant: "destructive",
+      });
+    }
+  };
 
   if (!event) return null;
 
@@ -158,14 +160,7 @@ export function EventDetailsDialog({
     }
   }
 
-  const handleJoinEvent = async (event_id: string) => {
-    try {
-      await onJoin?.()
-    } catch (error) {
-      console.log("Failed to join event", error);
-      console.error("Failed to join event", error);
-    }
-  }
+
   return (
     <>
 
@@ -192,7 +187,7 @@ export function EventDetailsDialog({
                 <div className="flex items-center">
                   <MapPin className="mr-2 h-5 w-5  text-indigo-600" />
                   <span className="text-gray-700 capitalize">
-                    Venue: {event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</span>
+                    Venue: {event.venue}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Tag className="h-5 w-5 text-indigo-600" />
@@ -223,7 +218,7 @@ export function EventDetailsDialog({
             <div className="flex flex-row gap-4 p-4">
               <Button
 
-                disabled={attendees.includes(session?.user?.email as string) || event.status === "pending"}
+                disabled={attendees.includes(session?.user?.email as string) || event.status === "pending" || isLoading}
                 onClick={() => handleJoinEvent(event._id.toString())}
               >{
                   attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
