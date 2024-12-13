@@ -5,11 +5,12 @@ import { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Calendar, MapPin, Clock, User } from 'lucide-react'
+import { Calendar, MapPin, Clock, User, MoveLeft } from 'lucide-react'
 import { motion } from "framer-motion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EventDetailsDialog } from "@/components/eventDetails"
+import { redirect } from "next/navigation"
 
 interface Event {
   _id: string;
@@ -87,6 +88,7 @@ const MyEvents = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="flex items-center gap-4 mb-8">
+          <Button onClick={() => redirect('/')}><MoveLeft className="inline-block" />Home</Button>
           <Avatar className="h-16 w-16">
             <AvatarImage src={session?.user?.image || ''} alt={session?.user?.name || ''} />
             <AvatarFallback><User className="h-8 w-8" /></AvatarFallback>
@@ -137,7 +139,7 @@ const EventCard = ({ event, onViewDetails }: { event: Event; onViewDetails: () =
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-primary" />
-          <p>{new Date(event.event_id.date).toLocaleDateString()}</p>
+          <p>{new Date(event.event_id.startDate).toDateString()}</p>
         </div>
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-primary" />

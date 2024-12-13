@@ -13,6 +13,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { EventDetailsDialog } from "@/components/eventDetails";
 import UserProfile from "@/components/userProfile";
 import { useSession } from "next-auth/react";
+import { ModeToggle } from "@/components/ToggleTheme";
 
 const getDaysInMonth = (year, month) => {
     return new Date(year, month + 1, 0).getDate();
@@ -61,7 +62,21 @@ export default function Calendar() {
                     startDate: new Date(event.startDate),
                     color: event.color || `bg-${['blue', 'green', 'purple', 'red', 'yellow', 'indigo'][Math.floor(Math.random() * 6)]}-500`
                 }));
-                setEvents(processedEvents);
+                // filter past events and events whose status is pending if user is not admin
+                const now = new Date();
+                const filteredEvents = processedEvents.filter(event => {
+                    // filter past event and events whose status is pending
+                    const eventStartDate = new Date(`${event.startDate.toDateString()} ${event.startTime}`);
+                    return eventStartDate >= now && (event.status === 'approved' || session && session.user.role === 'admin');
+                });
+                setEvents(filteredEvents.sort((a, b) => {
+                    const dateA = new Date(`${a.startDate.toDateString()} ${a.startTime}`);
+                    const dateB = new Date(`${b.startDate.toDateString()} ${b.startTime}`);
+                    return dateA - dateB;
+                })
+
+
+                );
                 console.log('Fetched events:', processedEvents);
             } catch (error) {
                 console.error('Error fetching events:', error);
@@ -293,6 +308,7 @@ export default function Calendar() {
                         )}
 
                         <UserProfile />
+                        <ModeToggle />
 
 
                     </div>

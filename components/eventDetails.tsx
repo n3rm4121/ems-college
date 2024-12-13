@@ -67,12 +67,19 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
       console.log("JoinEvent created", res.data);
 
       if (res.status === 201) {
-        alert("User is successfully joined the event");
+        toast({
+          title: "Event Joined",
+          description: `You have successfully joined the event "${event?.title}".`,
+        });
         setAttendees((prev) => [...prev, "session?.user?.email"]);
       }
     } catch (error) {
       console.error("Failed to join event", error);
-      alert("An error occurred while joining the event. Please try again.");
+      toast({
+        title: "Join Event Failed",
+        description: "There was an error joining the event.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -175,7 +182,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
           <div className="flex flex-row gap-4 p-6 pt-0">
             <Button
 
-              disabled={attendees.includes(session?.user?.email as string) || event.startDate < new Date().toISOString()}
+              disabled={attendees.includes(session?.user?.email as string) || event.startDate < new Date().toISOString() || event.status === "pending"}
               onClick={() => handleJoinEvent(event._id.toString())}
             >{
                 attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
