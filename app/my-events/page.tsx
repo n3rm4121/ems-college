@@ -95,9 +95,7 @@ const MyEvents = () => {
     return <ErrorState error={error} />;
   }
 
-  if (joinedEvents.length === 0) {
-    return <EmptyState />;
-  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
@@ -118,7 +116,7 @@ const MyEvents = () => {
         </div>
         <h2 className="text-2xl font-semibold mb-6">Your Joined Events</h2>
         {joinedEvents.length === 0 ? (
-          <EmptyState />
+          <EmptyState title={"No Events Joined Yet"} message={"You haven't joined any events. Start exploring and join some exciting events!"} />
         ) : (
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -127,16 +125,12 @@ const MyEvents = () => {
             animate="visible"
           >
             {joinedEvents.map((event, index) => (
-              event.event_id ? (
+              event.event_id && (
                 <motion.div key={event._id} variants={itemVariants} custom={index}>
                   <EventCard event={event.event_id} onViewDetails={() => handleOpenDialog(event)} />
-                </motion.div>) : (
-                <EmptyState key={index} />
-
+                </motion.div>
               )
-
             ))}
-
           </motion.div>
         )}
       </motion.div>
@@ -148,7 +142,7 @@ const MyEvents = () => {
       >
         <h2 className="text-2xl font-semibold mb-6">Your Created Events</h2>
         {userEvents.length === 0 ? (
-          <EmptyState />
+          <EmptyState title={"No Events Created Yet"} message={"You haven't created any events. Start creating and manage your events!"} />
         ) : (
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -164,6 +158,7 @@ const MyEvents = () => {
           </motion.div>
         )}
       </motion.div>
+
       <EventDetailsDialog
         event={selectedEvent?.event_id}
         isOpen={isDialogOpen}
@@ -171,7 +166,6 @@ const MyEvents = () => {
         showJoinButton={false}
       />
     </div>
-
   );
 };
 
@@ -208,11 +202,11 @@ const EventCard = ({ event, onViewDetails }) => (
   </Card>
 )
 
-const EmptyState = () => (
+const EmptyState = ({ title, message }) => (
   <Card className="text-center p-8">
     <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
     <h3 className="text-xl font-semibold mb-2">No Events Joined Yet</h3>
-    <p className="text-muted-foreground mb-4">You haven't joined any events. Start exploring and join some exciting events!</p>
+    <p className="text-muted-foreground mb-4">{message}</p>
     <Button asChild>
       <a href="/create">Explore Events</a>
     </Button>

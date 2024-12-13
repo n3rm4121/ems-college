@@ -186,6 +186,7 @@ export default function Calendar() {
         }
     };
 
+
     if (isLoading) {
         return <Spinner />;
     }
@@ -193,6 +194,7 @@ export default function Calendar() {
     if (!isAdmin && isInAdminRoute) {
         return <Unauthorized />;
     }
+    const renderedEvents = new Set();
 
     return (
         <div className="flex h-screen">
@@ -263,6 +265,8 @@ export default function Calendar() {
                                         key={event._id}
                                         className="p-2 rounded cursor-pointer bg-secondary"
                                         onClick={() => {
+                                            setSelectedEvent(event);
+
                                             setSelectedDate(event.startDate);
                                             setCurrentDate(new Date(event.startDate));
                                             scrollToEvent(event);
@@ -270,7 +274,7 @@ export default function Calendar() {
                                     >
                                         <div className="font-medium">{event.title}</div>
                                         <div className="text-sm text-gray-400">
-                                            {event.venue} - {event.startDate.toLocaleDateString()}
+                                            {event.venue} - {event.startDate.toDateString()}
                                         </div>
                                     </div>
                                 ))}
@@ -283,7 +287,7 @@ export default function Calendar() {
             <div className="flex-1 p-4 flex flex-col">
                 {/** Header */}
                 <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center">
                         <h2 className="text-xl">
                             {selectedDate.toLocaleString('default', { month: 'long', day: 'numeric', year: 'numeric' })}
                         </h2>
@@ -333,12 +337,23 @@ export default function Calendar() {
                                     <span className="absolute -top-3 -left-4 text-xs text-gray-400">
                                         {hour.toString().padStart(2, '0')}:00
                                     </span>
+
                                     {getEventsForDate(selectedDate)
                                         .filter(event => {
                                             const startHour = parseInt(event.startTime.split(':')[0]);
                                             const endHour = parseInt(event.endTime.split(':')[0]);
                                             const shouldDisplay = startHour <= hour && endHour > hour;
-                                            console.log(`Event ${event.title} at hour ${hour}: ${shouldDisplay ? 'displayed' : 'not displayed'}`);
+
+                                            // Prevent duplicate rendering
+                                            if (renderedEvents.has(event._id)) {
+                                                return false;
+                                            }
+
+                                            // Mark event as rendered
+                                            if (shouldDisplay) {
+                                                renderedEvents.add(event._id);
+                                            }
+
                                             return shouldDisplay;
                                         })
                                         .map(event => {
@@ -348,6 +363,7 @@ export default function Calendar() {
                                             const endMinute = parseInt(event.endTime.split(':')[1]);
                                             const top = (startHour === hour ? startMinute : 0) * (60 / 60);
                                             const height = ((endHour - startHour) * 60 + endMinute - startMinute) * (60 / 60);
+
                                             return (
                                                 <div
                                                     key={event._id}
@@ -363,11 +379,10 @@ export default function Calendar() {
                                                     <div className="text-xs md:text-sm">
                                                         {event.startTime} - {event.endTime}
                                                     </div>
-                                                    {/* <div className="text-xs hidden md:block">{event.venue}</div> */}
                                                 </div>
-
                                             );
                                         })}
+
                                 </div>
                             );
                         })}
