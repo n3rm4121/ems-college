@@ -13,7 +13,7 @@ export default function EventsPage() {
         const fetchEvents = async () => {
             try {
                 setIsLoading(true)
-                const response = await axios.get('http://localhost:3000/api/events')
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events`)
                 setEvents(response.data)
             } catch (error) {
                 console.error("Failed to fetch events:", error)

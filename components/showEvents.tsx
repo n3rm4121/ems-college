@@ -48,13 +48,13 @@ export default function ShowEvents() {
   useEffect(() => {
     const fetchAndProcessEvents = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/events');
+        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/events`);
         const events: Event[] = res.data;
-  
-        console.log("Fetched events:", events); 
-  
+
+        console.log("Fetched events:", events);
+
         const now = new Date();
-  
+
         const upcoming = events
           .filter((event) => {
             const eventStartDate = new Date(`${event.startDate}T${event.startTime}`);
@@ -65,13 +65,13 @@ export default function ShowEvents() {
             const dateB = new Date(`${b.startDate}T${b.startTime}`);
             return dateA.getTime() - dateB.getTime();
           });
-  
-        console.log("Upcoming events:", upcoming); 
-  
+
+        console.log("Upcoming events:", upcoming);
+
         const featured = events.filter((event) => event.featured === true);
-  
-        console.log("Featured events:", featured); 
-  
+
+        console.log("Featured events:", featured);
+
         setAllEvents(events);
         setUpcomingEvents(upcoming);
         setFeaturedEvents(featured);
@@ -79,7 +79,7 @@ export default function ShowEvents() {
         console.error("Error fetching events:", error);
       }
     };
-  
+
     fetchAndProcessEvents();
   }, []);
 

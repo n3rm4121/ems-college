@@ -10,8 +10,12 @@ import { Settings } from "./components/settings"
 import { Analytics } from "./components/analytics"
 import AllEvents from "./components/all-events"
 import Dashboard from "./components/dashboard"
+import { useSession } from "next-auth/react"
+import Unauthorized from "./components/unauthorized"
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+    const { data: session } = useSession();
+    const isAdmin = session?.user?.role === "admin";
     const [activeComponent, setActiveComponent] = useState("Dashboard")
 
     const renderComponent = () => {
@@ -32,19 +36,22 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <SidebarProvider>
-            <AppSidebar setActiveComponent={setActiveComponent} activeComponent={activeComponent} />
-            <SidebarInset>
-                <main className="min-h-screen bg-background">
-                    <div className="flex items-center h-16 px-4 border-b">
-                        <SidebarTrigger />
-                    </div>
-                    <div className="p-6">
-                        {renderComponent()}
-                    </div>
-                </main>
-            </SidebarInset>
-        </SidebarProvider>
+        <>
+            {!isAdmin ? <Unauthorized /> : (
+                <SidebarProvider>
+                    <AppSidebar setActiveComponent={setActiveComponent} activeComponent={activeComponent} />
+                    <SidebarInset>
+                        <main className="min-h-screen bg-background">
+                            <div className="flex items-center h-16 px-4 border-b">
+                                <SidebarTrigger />
+                            </div>
+                            <div className="p-6">
+                                {renderComponent()}
+                            </div>
+                        </main>
+                    </SidebarInset>
+                </SidebarProvider>
+            )}
+        </>
     )
-}
-
+}    

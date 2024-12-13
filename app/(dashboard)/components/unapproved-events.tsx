@@ -18,7 +18,7 @@ export function UnapprovedEvents() {
     const [unapprovedEvents, setUnapprovedEvents] = useState([])
     useEffect(() => {
         const fetchUnapprovedEvents = async () => {
-            const res = await fetch('http://localhost:3000/api/events/unapproved').then(res => res.json());
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/unapproved`).then(res => res.json());
             setUnapprovedEvents(res.data)
             console.log(res.data)
         }

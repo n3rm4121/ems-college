@@ -47,7 +47,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
       const fetchAttendees = async () => {
         setIsFetching(true);
         try {
-          const res = await axios.get(`http://localhost:3000/api/joinEvents?event_id=${event._id}`);
+          const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/joinEvents?event_id=${event._id}`);
           // console.log("Attendees: ", res.data.data.attendees);
           setAttendees(res.data.data.attendees);
         } catch (error) {
@@ -63,7 +63,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
 
   const handleJoinEvent = async (event_id: string) => {
     try {
-      const res = await axios.post(`http://localhost:3000/api/joinEvents`, { event_id });
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/joinEvents`, { event_id });
       console.log("JoinEvent created", res.data);
 
       if (res.status === 201) {
@@ -81,7 +81,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
   const handleDelete = async () => {
     try {
       const eventId = event._id
-      await axios.delete(`http://localhost:3000/api/events?eventId=${eventId}`)
+      await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/events?eventId=${eventId}`)
       toast({
         title: "Event Deleted",
         description: `Event "${event.title}" has been permanently deleted.`,
@@ -104,7 +104,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
         status: event.status === 'pending' ? 'approved' : 'pending'
       }
 
-      const updatedEvent = await axios.put(`http://localhost:3000/api/events/approve`, { updatePayload }).then(res => res.data)
+      const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/events/approve`, { updatePayload }).then(res => res.data)
       console.log("Updated Event:", updatedEvent)
 
       toast({

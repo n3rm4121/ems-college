@@ -48,7 +48,7 @@ export default function EventModal({ event, onClose, onUpdate, onDelete }: Event
                 startDate: new Date(editedEvent.startDate),
             }
 
-            const updatedEvent = await axios.put(`http://localhost:3000/api/events/`, { updatePayload }).then(res => res.data)
+            const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/events`, { updatePayload }).then(res => res.data)
             console.log("updated event: ", updatedEvent)
 
             onUpdate(updatedEvent.data)
@@ -73,7 +73,7 @@ export default function EventModal({ event, onClose, onUpdate, onDelete }: Event
     const handleDelete = async () => {
         try {
             const eventId = event._id
-            await axios.delete(`http://localhost:3000/api/events?eventId=${eventId}`)
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/events?eventId=${eventId}`)
             onDelete(event._id as string)
             toast({
                 title: "Event Deleted",
@@ -98,7 +98,7 @@ export default function EventModal({ event, onClose, onUpdate, onDelete }: Event
                 status: event.status === 'pending' ? 'approved' : 'pending'
             }
 
-            const updatedEvent = await axios.put(`http://localhost:3000/api/events/approve`, { updatePayload }).then(res => res.data)
+            const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/events/approve`, { updatePayload }).then(res => res.data)
 
             onUpdate(updatedEvent.data)
             toast({

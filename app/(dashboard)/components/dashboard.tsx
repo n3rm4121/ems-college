@@ -170,7 +170,7 @@ export default function Calendar() {
         return <div>Loading...</div>;
     }
     const isAdmin = session?.user?.role === 'admin';
-    if (!isAdmin) {
+    if (!isAdmin && isInAdminRoute) {
         return <div>Unauthorized</div>
     }
 
@@ -273,7 +273,10 @@ export default function Calendar() {
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                         <Dialog>
-                            <DialogTrigger asChild><Button>Create New Event</Button></DialogTrigger>
+                            <DialogTrigger asChild><Button
+                                className={!session?.user ? "opacity-50 cursor-not-allowed" : ""}
+                                disabled={!session?.user}
+                            >Create New Event</Button></DialogTrigger>
                             <DialogContent>
                                 <CreateEventForm
                                     onCreateEvent={handleCreateEvent}
@@ -283,7 +286,7 @@ export default function Calendar() {
                                 />
                             </DialogContent>
                         </Dialog>
-                        {!isInAdminRoute && (
+                        {!isInAdminRoute && isAdmin && (
                             <Button variant="outline" className="text-gray-400" onClick={() => window.location.href = '/admin'}>
                                 Admin Dashboard
                             </Button>

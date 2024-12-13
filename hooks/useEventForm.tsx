@@ -41,7 +41,7 @@ export const useEventForm = () => {
 
     const submitForm = async () => {
         console.log("Submitting form data:", formData);
-        await axios.post('http://localhost:3000/api/events', formData)
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/events`, formData)
     };
 
     return {
