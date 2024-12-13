@@ -1,5 +1,6 @@
-import Event, { IEvent } from "@/models/events";
 import dbConnect from "@/lib/db"
+import Event from "@/models/events";
+import { IEvent } from "@/types/event";
 
 export const getEventsFromDb = async (): Promise<IEvent[]> => {
     await dbConnect();

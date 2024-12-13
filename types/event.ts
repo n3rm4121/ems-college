@@ -7,7 +7,9 @@ export interface IEvent {
     date: Date;
     startTime: string;
     endTime: string;
+    startDate?: string;
     venue: string;
+    endDate?: string
     organizer: string;
     status: 'pending' | 'approved' | 'draft';
     images: string[];

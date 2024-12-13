@@ -1,48 +1,9 @@
-// import { NextRequest, NextResponse } from "next/server";
-// import Event from "@/models/events";
-// import dbConnect from "@/lib/db";
-// import { auth } from "@/auth";
-// import User from "@/models/user";
-// export const POST = async (req: NextRequest, res: Response) => {
-//     const session = await auth();
-//     if (!session) {
-//         return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-//     }
-//     const userEmail = session?.user?.email;
-//     const userName = session?.user?.name;
-
 import { auth } from "@/auth";
 import dbConnect from "@/lib/db";
 import Event from "@/models/events";
 import { NextRequest, NextResponse } from "next/server";
 
-
-//     await dbConnect();
-//     const body = await req.json();
-//     const { newEvent } = body;
-//     await Event.create({
-//         title: newEvent.title,
-//         description: newEvent.description,
-//         startDate: newEvent.startDate,
-//         startTime: newEvent.startTime,
-//         endTime: newEvent.endTime,
-//         venue: newEvent.venue,
-//         organizer: userEmail,
-//         status: "pending",
-//     });
-//     // Save the event data to your database
-//     return NextResponse.json({ message: "Event created successfully" });
-// }
-
-
-// export const GET = async (req: NextRequest, res: Response) => {
-//     await dbConnect();
-//     const events = await Event.find();
-//     console.log("events: ", events);
-//     return NextResponse.json(events);
-// }
-
-export const PUT = async (req: NextRequest, res: Response) => {
+export const PUT = async (req: NextRequest) => {
     // update the incomming event data
     await dbConnect();
     const session = await auth();
@@ -79,7 +40,7 @@ export const PUT = async (req: NextRequest, res: Response) => {
 }
 
 
-export const DELETE = async (req: NextRequest, res: Response) => {
+export const DELETE = async (req: NextRequest) => {
     await dbConnect();
     const session = await auth();
     if (!session) {
