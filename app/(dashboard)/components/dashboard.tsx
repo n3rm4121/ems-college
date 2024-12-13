@@ -33,12 +33,18 @@ export default function Calendar() {
     const [showCreateEventForm, setShowCreateEventForm] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const timelineRef = useRef(null);
-    const {data:session} = useSession();    
+    const { data: session } = useSession();
+    const [isInAdminRoute, setIsInAdminRoute] = useState(false);
 
     const handleEventClick = (event) => {
         setSelectedEvent(event);
         setIsDialogOpen(true);
     };
+    // get current route and if its not /admin then add a button to redirect to /admin if user is admin
+    useEffect(() => {
+        const path = window.location.pathname;
+        setIsInAdminRoute(path.includes('admin'));
+    }, []);
 
     useEffect(() => {
         const fetchEvents = async () => {
@@ -163,7 +169,7 @@ export default function Calendar() {
         return <div>Loading...</div>;
     }
     const isAdmin = session?.user?.role === 'admin';
-    if(!isAdmin){
+    if (!isAdmin) {
         return <div>Unauthorized</div>
     }
 
@@ -276,7 +282,15 @@ export default function Calendar() {
                                 />
                             </DialogContent>
                         </Dialog>
+                        {!isInAdminRoute && (
+                            <Button variant="outline" className="text-gray-400" onClick={() => window.location.href = '/admin'}>
+                                Admin Dashboard
+                            </Button>
+                        )}
+
                         <UserProfile />
+
+
                     </div>
                 </div>
 
@@ -308,24 +322,20 @@ export default function Calendar() {
                                                 <div
                                                     key={event._id}
                                                     onClick={() => handleEventClick(event)}
-                                                    className={`absolute left-16 right-4 rounded p-2 ${event.color} border-2 border-green-500 overflow-hidden cursor-pointer`}
+                                                    className={`absolute left-4 right-4 md:left-16 md:right-4 rounded p-2 ${event.color} border-2 border-green-500 overflow-hidden cursor-pointer`}
                                                     style={{
                                                         top: `${top}px`,
                                                         height: `${height}px`,
                                                         zIndex: startHour === hour ? 10 : 5,
                                                     }}
                                                 >
-                                                    <div className="font-semibold">{event.title}</div>
-                                                    <div className="text-sm">
+                                                    <div className="font-semibold text-sm md:text-base">{event.title}</div>
+                                                    <div className="text-xs md:text-sm">
                                                         {event.startTime} - {event.endTime}
                                                     </div>
-                                                    <div className="text-xs">{event.venue}</div>
-                                                    {event.description && (
-                                                        <div className="text-xs mt-1 overflow-hidden text-ellipsis whitespace-nowrap">
-                                                            {event.description}
-                                                        </div>
-                                                    )}
+                                                    {/* <div className="text-xs hidden md:block">{event.venue}</div> */}
                                                 </div>
+
                                             );
                                         })}
                                 </div>

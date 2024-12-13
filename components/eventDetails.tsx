@@ -1,7 +1,7 @@
 'use client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Clock, Tag, User } from "lucide-react";
+import { Calendar, MapPin, Clock, Tag, User, Trash2 } from "lucide-react";
 import { ImageCarousel } from "./imagecarousel";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -9,6 +9,9 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { ObjectId } from "mongoose";
 import { useSession } from "next-auth/react";
+import { Toaster } from "./ui/toaster";
+import { useToast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 
 interface EventDetailsDialogProps {
   event: Event | null;
@@ -29,13 +32,16 @@ interface Event {
 }
 
 export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialogProps) {
+  console.log('event dialgo: ', event)
+  const { toast } = useToast();
   const [attendees, setAttendees] = useState<string[]>([]);
   const [isFetching, setIsFetching] = useState(false);
-  const {data: session }  = useSession()
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin";
   useEffect(() => {
     console.log("Dialog isOpen:", isOpen, "Event:", event);
   }, [isOpen, event]);
-  
+
   useEffect(() => {
     if (event) {
       const fetchAttendees = async () => {
@@ -72,69 +78,150 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
 
   if (!event) return null;
 
+  const handleDelete = async () => {
+    try {
+      const eventId = event._id
+      await axios.delete(`http://localhost:3000/api/events?eventId=${eventId}`)
+      toast({
+        title: "Event Deleted",
+        description: `Event "${event.title}" has been permanently deleted.`,
+        variant: "destructive"
+      })
+    } catch (error) {
+      console.error("Failed to delete event:", error)
+      toast({
+        title: "Deletion Failed",
+        description: "There was an error deleting the event.",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const handleApprove = async () => {
+    try {
+      const updatePayload = {
+        ...event,
+        status: event.status === 'pending' ? 'approved' : 'pending'
+      }
+
+      const updatedEvent = await axios.put(`http://localhost:3000/api/events/approve`, { updatePayload }).then(res => res.data)
+      console.log("Updated Event:", updatedEvent)
+
+      toast({
+        title: "Event Status Changed",
+        description: `Event "${updatedEvent.data.title}" status changed to ${updatedEvent.data.status}.`,
+        variant: "default"
+      })
+    } catch (error) {
+      console.error("Failed to change event status:", error)
+      toast({
+        title: "Status Change Failed",
+        description: "There was an error changing the event status.",
+        variant: "destructive"
+      })
+    }
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] h-[80vh] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
-        <DialogHeader className="p-6 pb-2">
-          <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="flex-grow px-6 relative mt-6">
-          <div className="space-y-6">
-            <div className="grid gap-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-indigo-600" />
-                <span className="text-gray-700">
-                  {new Date(event.startDate).toDateString()}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-indigo-600" />
-                <span className="text-gray-700">
-                  {event.startTime} - {event.endTime}
-                </span>
+    <>
+
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="md:min-w-[700px] md:min-h-[90vh] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
+          <DialogHeader className="p-6 pb-2">
+            <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="flex-grow px-6 relative mt-6">
+            <div className="space-y-6">
+              <div className="grid gap-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-indigo-600" />
+                  <span className="text-gray-700">
+                    {new Date(event.startDate).toDateString()}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-indigo-600" />
+                  <span className="text-gray-700">
+                    {event.startTime} - {event.endTime}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  <MapPin className="mr-2 h-5 w-5 text-gray-400" />
+                  <span className="text-gray-700 capitalize">
+                    Venue: {event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Tag className="h-5 w-5 text-indigo-600" />
+                  <span className="text-gray-700 capitalize">
+                    Status: <Badge variant={event.status === "approved" ? "default" : "secondary"}>{event.status}</Badge>
+                  </span>
+                </div>
               </div>
               <div className="flex items-center">
-              <MapPin className="mr-2 h-5 w-5 text-gray-400" />
-              <span className="text-gray-700 capitalize">
-                Venue: {event.venue === 'hall1' ? 'Hall 1' : 'Hall 2'}</span>
-            </div>
-              <div className="flex items-center gap-2">
-                <Tag className="h-5 w-5 text-indigo-600" />
+                <User className="mr-2 h-5 w-5 text-gray-400" />
                 <span className="text-gray-700 capitalize">
-                  Status: <Badge variant={event.status === "approved" ? "default" : "secondary"}>{event.status}</Badge>
-                </span>
+                  Event Organizer: {event?.organizer}</span>
+              </div>
+              <div className="flex flex-col gap-4 border-t border-gray-200 pt-4">
+                <h3 className="text-lg font-semibold text-indigo-800">Description</h3>
+                <div className="flex flex-wrap items-start gap-4 text-gray-700">
+                  <p className="flex-1 text-justify">
+                    {event.description}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center">
-              <User className="mr-2 h-5 w-5 text-gray-400" />
-              <span className="text-gray-700 capitalize">
-                Event Organizer: {event?.organizer}</span>
-            </div>
-            <div className="flex flex-col gap-4 border-t border-gray-200 pt-4">
-              <h3 className="text-lg font-semibold text-indigo-800">Description</h3>
-              <div className="flex flex-wrap items-start gap-4 text-gray-700">
-                <p className="flex-1 text-justify">
-                  {event.description}
-                </p>
-              </div>
-            </div>
-          </div>
-        </ScrollArea>
-        <div className="p-6 pt-2 mt-4 mb-4">
-          <Button
+          </ScrollArea>
+          <div className="flex flex-row gap-4 p-6 pt-0">
+            <Button
 
-            disabled={attendees.includes(session?.user?.email as string) || event.startDate < new Date().toISOString()}
-            onClick={() => handleJoinEvent(event._id.toString())}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-          >{
-             attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
-          }
-          </Button>
-          <Button onClick={onClose} className="mt-4 w-full bg-gray-600 hover:bg-gray-700 text-white">
-            Close
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+              disabled={attendees.includes(session?.user?.email as string) || event.startDate < new Date().toISOString()}
+              onClick={() => handleJoinEvent(event._id.toString())}
+            >{
+                attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
+              }
+            </Button>
+            <Button onClick={onClose}>
+              Close
+            </Button>
+            {isAdmin && (
+              <>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      className="bg-red-600 hover:bg-red-700 text-white flex items-center"
+                    >
+                      <Trash2 className="mr-2" size={16} /> Delete Event
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete the event.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+                {(event.status === "pending" || event.status === "approved") && (
+                  <Button
+                    onClick={handleApprove}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                  >
+                    {event.status === 'pending' ? 'Approve Event' : 'Mark as Pending'}
+                  </Button>
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Toaster />
+    </>
   );
 }

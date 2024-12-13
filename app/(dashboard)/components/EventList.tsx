@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import EventModal from "./EventModal"
 import { Calendar, Timer } from "lucide-react"
+import { EventDetailsDialog } from "@/components/eventDetails"
 
 interface EventListProps {
     events: IEvent[]
@@ -56,13 +57,15 @@ export default function EventList({
             </div>
 
             {selectedEvent && (
-                <EventModal
+
+                <EventDetailsDialog
                     event={selectedEvent}
+                    isOpen={true}
                     onClose={() => setSelectedEvent(null)}
-                    onUpdate={onUpdateEvents}
-                    onDelete={onDeleteEvent}
+                    showJoinButton={false}
                 />
             )}
+
         </div>
     )
 }
