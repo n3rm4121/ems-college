@@ -131,7 +131,7 @@ const MyEvents = () => {
                 <motion.div key={event._id} variants={itemVariants} custom={index}>
                   <EventCard event={event.event_id} onViewDetails={() => handleOpenDialog(event)} />
                 </motion.div>) : (
-                <EmptyState />
+                <EmptyState key={index} />
 
               )
 
