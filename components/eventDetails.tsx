@@ -104,7 +104,7 @@ export function EventDetailsDialog({ event, isOpen, onClose }: EventDetailsDialo
         status: event.status === 'pending' ? 'approved' : 'pending'
       }
 
-      const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/events/approve`, { updatePayload }).then(res => res.data)
+      const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/events/approve`, { updatePayload }).then(res => res.data)
       console.log("Updated Event:", updatedEvent)
 
       toast({
