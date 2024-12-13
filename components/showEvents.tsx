@@ -49,29 +49,37 @@ export default function ShowEvents() {
     const fetchAndProcessEvents = async () => {
       try {
         const res = await axios.get('http://localhost:3000/api/events');
-        const events = res.data;
-
+        const events: Event[] = res.data;
+  
+        console.log("Fetched events:", events); 
+  
         const now = new Date();
-
-        const upcoming: Event[] = events.filter((event: Event) => {
-          const eventStartDate = new Date(event.startDate);
-          return eventStartDate > now;
-        });
-
-        const featured: Event[] = events.filter((event: Event) => {
-          const eventStartDate = new Date(event.startDate);
-          return eventStartDate <= now;
-        });
-
-        // only set those events whose status is approved and start date is in the future
-        setAllEvents(events.filter((event: Event) => event.status === 'approved'));
+  
+        const upcoming = events
+          .filter((event) => {
+            const eventStartDate = new Date(`${event.startDate}T${event.startTime}`);
+            return eventStartDate > now;
+          })
+          .sort((a, b) => {
+            const dateA = new Date(`${a.startDate}T${a.startTime}`);
+            const dateB = new Date(`${b.startDate}T${b.startTime}`);
+            return dateA.getTime() - dateB.getTime();
+          });
+  
+        console.log("Upcoming events:", upcoming); 
+  
+        const featured = events.filter((event) => event.featured === true);
+  
+        console.log("Featured events:", featured); 
+  
+        setAllEvents(events);
         setUpcomingEvents(upcoming);
         setFeaturedEvents(featured);
       } catch (error) {
         console.error("Error fetching events:", error);
       }
     };
-
+  
     fetchAndProcessEvents();
   }, []);
 

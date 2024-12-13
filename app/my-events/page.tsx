@@ -121,6 +121,8 @@ const MyEvents = () => {
 };
 
 const EventCard = ({ event, onViewDetails }: { event: Event; onViewDetails: () => void }) => (
+  console.log('event', event),
+
   <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
     <CardHeader>
       <CardTitle className="flex justify-between items-center">
