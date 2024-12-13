@@ -75,7 +75,13 @@ export async function GET() {
 export async function POST(request: Request) {
     await dbConnect();
     const data = await request.json();
+    console.log("origin data: ", data);
+    const session = await auth();
+    const userEmail = session?.user?.email;
+    data.organizer = userEmail;
     const newEvent = new Event(data);
+    console.log("new data: ", newEvent);
+
     await newEvent.save();
     return NextResponse.json(newEvent);
 }

@@ -10,6 +10,7 @@ const EventSchema = new mongoose.Schema({
     description: { type: String },
     color: { type: String, required: true },
     status: { type: String, enum: ['pending', 'approved'], default: 'pending' },
+    organizer: { type: String, required: true },
 });
 
 

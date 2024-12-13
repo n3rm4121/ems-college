@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { EventDetailsDialog } from "@/components/eventDetails"
 import { redirect } from "next/navigation"
+import axios from "axios"
 
 interface Event {
   _id: string;
@@ -39,7 +40,22 @@ const MyEvents = () => {
   const { data: session } = useSession();
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [userEvents, setUserEvents] = useState([]);
 
+  useEffect(() => {
+    const fetchUserEvents = async () => {
+      try {
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events`);
+        console.log(response.data);
+        setUserEvents(response.data);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchUserEvents();
+  }, [])
   useEffect(() => {
     const fetchJoinedEvents = async () => {
       try {
@@ -110,6 +126,30 @@ const MyEvents = () => {
           >
             {joinedEvents.map((event, index) => (
               <motion.div key={event._id} variants={itemVariants} custom={index}>
+                <EventCard event={event.event_id} onViewDetails={() => handleOpenDialog(event)} />
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-2xl font-semibold mb-6">Your Created Events</h2>
+        {userEvents.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <motion.div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            {userEvents.map((event, index) => (
+              <motion.div key={event._id} variants={itemVariants} custom={index}>
                 <EventCard event={event} onViewDetails={() => handleOpenDialog(event)} />
               </motion.div>
             ))}
@@ -123,6 +163,7 @@ const MyEvents = () => {
         showJoinButton={false}
       />
     </div>
+
   );
 };
 
@@ -132,22 +173,22 @@ const EventCard = ({ event, onViewDetails }: { event: Event; onViewDetails: () =
   <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
     <CardHeader>
       <CardTitle className="flex justify-between items-center">
-        <span>{event.event_id.title}</span>
+        <span>{event.title}</span>
       </CardTitle>
     </CardHeader>
     <CardContent>
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <Calendar className="h-4 w-4 text-primary" />
-          <p>{new Date(event.event_id.startDate).toDateString()}</p>
+          <p>{new Date(event.startDate).toDateString()}</p>
         </div>
         <div className="flex items-center gap-2">
           <Clock className="h-4 w-4 text-primary" />
-          <p>{event.event_id.startTime} - {event.event_id.endTime}</p>
+          <p>{event.startTime} - {event.endTime}</p>
         </div>
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4 text-primary" />
-          <p>{event.event_id.venue}</p>
+          <p>{event.venue}</p>
         </div>
       </div>
     </CardContent>
