@@ -68,7 +68,7 @@ export default function Calendar() {
                 const filteredEvents = processedEvents.filter(event => {
                     const eventStartDate = new Date(`${event.startDate.toDateString()} ${event.startTime}`);
                     const eventEndDate = new Date(`${event.startDate.toDateString()} ${event.endTime}`);
-                    return eventEndDate >= now && (event.status === 'approved' || session && session.user.role === 'admin');
+                    return eventEndDate >= now;
                 });
                 setEvents(filteredEvents.sort((a, b) => {
                     const dateA = new Date(`${a.startDate.toDateString()} ${a.startTime}`);
