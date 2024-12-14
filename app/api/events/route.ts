@@ -74,13 +74,19 @@ export async function GET() {
 
 export async function POST(request: Request) {
     await dbConnect();
+
     const data = await request.json();
     console.log("origin data: ", data);
     const session = await auth();
+    const isAdmin = session.user?.role === "admin";
     const userEmail = session?.user?.email;
     const userName = session?.user?.name;
     const theOrganizer = userEmail + " " + userName;
+    if (!isAdmin) {
+        data.status = "pending";
+    }
     data.organizer = theOrganizer;
+
     const newEvent = new Event(data);
     console.log("new data: ", newEvent);
 

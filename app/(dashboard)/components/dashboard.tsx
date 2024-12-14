@@ -162,6 +162,9 @@ export default function Calendar() {
                 body: JSON.stringify(newEvent),
             });
 
+            const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents`, { event_id });
+            console.log('event_id from post joinEvents', event_id);
+
             if (!response.ok) {
                 throw new Error('Failed to create event');
             }

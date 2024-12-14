@@ -1,7 +1,7 @@
 'use client'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, Clock, Tag, User, Trash2 } from "lucide-react";
+import { Calendar, MapPin, Clock, Tag, User, Trash2 } from 'lucide-react';
 import { ImageCarousel } from "./imagecarousel";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -13,6 +13,8 @@ import { Toaster } from "./ui/toaster";
 import { useToast } from "@/hooks/use-toast";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
 import { Separator } from "./ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface EventDetailsDialogProps {
   event: Event | null;
@@ -68,10 +70,10 @@ export function EventDetailsDialog({
         setIsFetching(true);
         try {
           const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents?event_id=${event._id}`);
-          // console.log("Attendees: ", res.data.data.attendees);
-          setAttendees(res.data.data.attendees);
+          setAttendees(res.data.data.attendees || []);
         } catch (error) {
           console.error("Failed to fetch attendees", error);
+          setAttendees([]);
         } finally {
           setIsFetching(false);
         }
@@ -79,7 +81,7 @@ export function EventDetailsDialog({
 
       fetchAttendees();
     }
-  }, [event, setAttendees]);
+  }, [event]);
 
   const handleJoinEvent = async (event_id: string) => {
     try {
@@ -92,7 +94,7 @@ export function EventDetailsDialog({
           title: "Event Joined",
           description: `You have successfully joined the event "${event?.title}".`,
         });
-        setAttendees((prev) => [...prev, "session?.user?.email"]);
+        setAttendees((prev) => [...prev, session?.user?.email as string]);
       }
     } catch (error) {
       console.error("Failed to join event", error);
@@ -129,50 +131,6 @@ export function EventDetailsDialog({
 
   if (!event) return null;
 
-  // const handleDelete = async () => {
-  //   try {
-  //     const eventId = event._id
-  //     await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/events?eventId=${eventId}`)
-  //     toast({
-  //       title: "Event Deleted",
-  //       description: `Event "${event.title}" has been permanently deleted.`,
-  //       variant: "destructive"
-  //     })
-  //   } catch (error) {
-  //     console.error("Failed to delete event:", error)
-  //     toast({
-  //       title: "Deletion Failed",
-  //       description: "There was an error deleting the event.",
-  //       variant: "destructive"
-  //     })
-  //   }
-  // }
-
-  // const handleApprove = async () => {
-  //   try {
-  //     const updatePayload = {
-  //       ...event,
-  //       status: event.status === 'pending' ? 'approved' : 'pending'
-  //     }
-
-  //     const updatedEvent = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/events/approve`, { updatePayload }).then(res => res.data)
-  //     console.log("Updated Event:", updatedEvent)
-
-  //     toast({
-  //       title: "Event Status Changed",
-  //       description: `Event "${updatedEvent.data.title}" status changed to ${updatedEvent.data.status}.`,
-  //       variant: "default"
-  //     })
-  //   } catch (error) {
-  //     console.error("Failed to change event status:", error)
-  //     toast({
-  //       title: "Status Change Failed",
-  //       description: "There was an error changing the event status.",
-  //       variant: "destructive"
-  //     })
-  //   }
-  // }
-
   const handleDelete = async () => {
     try {
       await onDelete?.()
@@ -194,11 +152,11 @@ export function EventDetailsDialog({
     <>
 
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="md:min-w-[700px] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
+        <DialogContent className="md:min-w-[700px] max-h-[90vh] flex flex-col p-0 gap-0 bg-gradient-to-br from-indigo-50 to-purple-50">
           <DialogHeader className="p-6 pb-2">
             <DialogTitle className="text-3xl font-bold text-indigo-800">{event.title}</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="flex-grow px-6 relative mt-6">
+          <ScrollArea className="flex-grow px-6 relative mt-6" style={{ height: 'calc(90vh - 200px)' }}>
             <div className="space-y-6">
               {isPastEvent(event.startDate) && (
                 <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
@@ -243,6 +201,32 @@ export function EventDetailsDialog({
                     {event.description}
                   </p>
                 </div>
+              </div>
+              <div className="flex flex-col gap-4 border-t border-gray-200 pt-4">
+                <h3 className="text-lg font-semibold text-indigo-800">Attendees ({attendees.length})</h3>
+                <Card className="bg-white">
+                  <CardContent className="p-4">
+                    {isFetching ? (
+                      <p className="text-gray-500">Loading attendees...</p>
+                    ) : attendees.length > 0 ? (
+                      <ScrollArea className="h-[200px] w-full">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {attendees.map((attendee, index) => (
+                            <div key={index} className="flex items-center space-x-3">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={`https://api.dicebear.com/6.x/initials/svg?seed=${attendee}`} />
+                                <AvatarFallback>{attendee.charAt(0).toUpperCase()}</AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm text-gray-700 truncate">{attendee}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    ) : (
+                      <p className="text-gray-500">No attendees yet.</p>
+                    )}
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </ScrollArea>
@@ -316,3 +300,4 @@ export function EventDetailsDialog({
     </>
   );
 }
+

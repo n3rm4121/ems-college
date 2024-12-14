@@ -97,16 +97,18 @@ export async function GET(req: Request) {
     try {
         const url = new URL(req.url);
         const event_id = url.searchParams.get("event_id");
+        console.log('event_id from get joinEvents', event_id);
 
         if (!event_id) {
             return NextResponse.json({ message: "Missing event_id" }, { status: 400 });
         }
 
         const attendees = await JoinEvent.findOne({ event_id }).populate("attendees");
+        console.log('attendees from get joinEvents', attendees);
 
-        // if (!attendees) {
-        //     return NextResponse.json({ message: "No attendees found for this event" }, { status: 404 });
-        // }
+        if (!attendees) {
+            return NextResponse.json({ message: "No attendees found for this event" }, { status: 200 });
+        }
 
         return NextResponse.json({ success: true, data: attendees }, { status: 200 });
     } catch (error) {

@@ -50,6 +50,7 @@ const MyEvents = () => {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events`);
         console.log("fetch user events: ", response.data);
         setUserEvents(response.data);
+
         setLoading(false);
       } catch (err) {
         setError((err as Error).message);
