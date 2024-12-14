@@ -23,7 +23,8 @@ export default function EventList() {
             try {
                 setIsLoading(true)
                 const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events`)
-                setEvents(response.data)
+
+                setEvents(response.data.reverse())
             } catch (error) {
                 console.error("Failed to fetch events:", error)
             } finally {
@@ -40,12 +41,12 @@ export default function EventList() {
     )
 
     const approvedEvents = useMemo(() =>
-        events.filter(event => event.status === "approved"),
+        events.filter(event => event.status === "approved" && new Date(event.startDate) >= new Date()),
         [events]
     )
 
     const pastEvents = useMemo(() =>
-        events.filter(event => new Date(event.startDate) < new Date()),
+        events.filter(event => new Date(event.startDate) < new Date()).sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()),
         [events]
     )
 
@@ -127,8 +128,8 @@ export default function EventList() {
     };
 
     return (
-        <div>
-            <h2 className="text-xl font-semibold mb-2">Pending Events</h2>
+        <div className="space-y-8">
+            <h2 className="text-xl font-semibold mb-10">Pending Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
                 {pendingEvents.map(event => (
                     <EventCard
@@ -139,7 +140,7 @@ export default function EventList() {
                 ))}
             </div>
 
-            <h2 className="text-xl font-semibold mb-2">Approved Events</h2>
+            <h2 className="text-xl font-semibold mb-10">Approved Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {approvedEvents.map(event => (
                     <EventCard
@@ -150,7 +151,7 @@ export default function EventList() {
                 ))}
             </div>
 
-            <h2 className="text-xl font-semibold mb-2">Past Events</h2>
+            <h2 className="text-xl font-semibold mb-10">Past Events</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pastEvents.map(event => (
                     <EventCard
