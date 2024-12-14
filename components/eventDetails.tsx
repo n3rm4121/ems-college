@@ -52,9 +52,15 @@ export function EventDetailsDialog({
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === "admin";
   const [isLoading, setIsLoading] = useState(false);
+  const isPastEvent = (date: string) => {
+    return new Date(date) < new Date();
+  };
+
   useEffect(() => {
     console.log("Dialog isOpen:", isOpen, "Event:", event);
   }, [isOpen, event]);
+
+
 
   useEffect(() => {
     if (event) {
@@ -194,6 +200,12 @@ export function EventDetailsDialog({
           </DialogHeader>
           <ScrollArea className="flex-grow px-6 relative mt-6">
             <div className="space-y-6">
+              {isPastEvent(event.startDate) && (
+                <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4" role="alert">
+                  <p className="font-bold">Past Event</p>
+                  <p>This event has already taken place.</p>
+                </div>
+              )}
               <div className="grid gap-4">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-indigo-600" />
@@ -209,7 +221,7 @@ export function EventDetailsDialog({
                 </div>
                 <div className="flex items-center">
                   <MapPin className="mr-2 h-5 w-5  text-indigo-600" />
-                  <span className="text-gray-700 capitalize">
+                  <span className="text-gray-700">
                     Venue: {event.venue}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -221,7 +233,7 @@ export function EventDetailsDialog({
               </div>
               <div className="flex items-center">
                 <User className="mr-2 h-5 w-5  text-indigo-600" />
-                <span className="text-gray-700 capitalize">
+                <span className="text-gray-700">
                   Event Organizer: {event?.organizer}</span>
               </div>
               <div className="flex flex-col gap-4 border-t border-gray-200 pt-4">
@@ -239,57 +251,62 @@ export function EventDetailsDialog({
             <Separator className="mt-10 mb-2" />
 
             <div className="flex flex-row gap-4 p-4">
-              <Button
-                disabled={event.status === "pending" || isLoading}
-                onClick={() =>
-                  attendees.includes(session?.user?.email as string)
-                    ? handleCancelRegistration(event._id.toString())
-                    : handleJoinEvent(event._id.toString())
-                }
-                className={`${attendees.includes(session?.user?.email as string)
-                    ? "bg-red-500 hover:bg-red-600"
-                    : "bg-blue-500 hover:bg-blue-600"
-                  } text-white font-medium px-4 py-2 rounded`}
-              >
-                {attendees.includes(session?.user?.email as string)
-                  ? "Cancel Registration"
-                  : "Join Event"}
-              </Button>
-
-
-              {isAdmin && (
+              {!isPastEvent(event.startDate) ? (
                 <>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        className="bg-red-600 hover:bg-red-700 text-white flex items-center"
-                      >
-                        <Trash2 className="mr-2" size={16} /> Delete Event
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the event.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                  {(event.status === "pending" || event.status === "approved") && (
-                    <Button
-                      onClick={handleApprove}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white"
-                    >
-                      {event.status === 'pending' ? 'Approve Event' : 'Mark as Pending'}
-                    </Button>
+                  <Button
+                    disabled={event.status === "pending" || isLoading}
+                    onClick={() =>
+                      attendees.includes(session?.user?.email as string)
+                        ? handleCancelRegistration(event._id.toString())
+                        : handleJoinEvent(event._id.toString())
+                    }
+                    className={`${attendees.includes(session?.user?.email as string)
+                      ? "bg-red-500 hover:bg-red-600"
+                      : "bg-blue-500 hover:bg-blue-600"
+                      } text-white font-medium px-4 py-2 rounded`}
+                  >
+                    {attendees.includes(session?.user?.email as string)
+                      ? "Cancel Registration"
+                      : "Join Event"}
+                  </Button>
+
+                  {isAdmin && (
+                    <>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            className="bg-red-600 hover:bg-red-700 text-white flex items-center"
+                          >
+                            <Trash2 className="mr-2" size={16} /> Delete Event
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently delete the event.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      {(event.status === "pending" || event.status === "approved") && (
+                        <Button
+                          onClick={handleApprove}
+                          className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                        >
+                          {event.status === 'pending' ? 'Approve Event' : 'Mark as Pending'}
+                        </Button>
+                      )}
+                    </>
                   )}
                 </>
+              ) : (
+                <p className="text-gray-600 italic">This event has already taken place.</p>
               )}
             </div>
           </div>

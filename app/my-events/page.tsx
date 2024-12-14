@@ -46,9 +46,11 @@ const MyEvents = () => {
   useEffect(() => {
     const fetchUserEvents = async () => {
       try {
+        setLoading(true);
         const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/events`);
-        console.log(response.data);
+        console.log("fetch user events: ", response.data);
         setUserEvents(response.data);
+        setLoading(false);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -125,6 +127,7 @@ const MyEvents = () => {
             animate="visible"
           >
             {joinedEvents.map((event, index) => (
+              // console.log('joined event', event),
               event.event_id && (
                 <motion.div key={event._id} variants={itemVariants} custom={index}>
                   <EventCard event={event.event_id} onViewDetails={() => handleOpenDialog(event)} />
@@ -151,6 +154,7 @@ const MyEvents = () => {
             animate="visible"
           >
             {userEvents.map((event, index) => (
+              // console.log('user event', event),
               <motion.div key={event._id} variants={itemVariants} custom={index}>
                 <EventCard event={event} onViewDetails={() => handleOpenDialog(event)} />
               </motion.div>
@@ -160,7 +164,7 @@ const MyEvents = () => {
       </motion.div>
 
       <EventDetailsDialog
-        event={selectedEvent?.event_id}
+        event={selectedEvent?.event_id || selectedEvent}
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
         showJoinButton={false}

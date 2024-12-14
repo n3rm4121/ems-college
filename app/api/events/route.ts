@@ -78,7 +78,9 @@ export async function POST(request: Request) {
     console.log("origin data: ", data);
     const session = await auth();
     const userEmail = session?.user?.email;
-    data.organizer = userEmail;
+    const userName = session?.user?.name;
+    const theOrganizer = userEmail + " " + userName;
+    data.organizer = theOrganizer;
     const newEvent = new Event(data);
     console.log("new data: ", newEvent);
 
