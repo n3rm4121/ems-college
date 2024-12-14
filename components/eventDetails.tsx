@@ -98,6 +98,29 @@ export function EventDetailsDialog({
     }
   };
 
+  const handleCancelRegistration = async (event_id: string) => {
+    try {
+      setIsLoading(true);
+      const res = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/joinEvents?event_id=${event_id}`);
+      console.log("JoinEvent deleted", res.data);
+      setIsLoading(false);
+      if (res.status === 200) {
+        toast({
+          title: "Registration Cancelled",
+          description: `You have successfully cancelled your registration for the event "${event?.title}".`,
+        });
+        setAttendees((prev) => prev.filter((email) => email !== session?.user?.email));
+      }
+    } catch (error) {
+      console.error("Failed to cancel registration", error);
+      toast({
+        title: "Cancellation Failed",
+        description: "There was an error cancelling your registration for the event.",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!event) return null;
 
   // const handleDelete = async () => {
@@ -217,13 +240,23 @@ export function EventDetailsDialog({
 
             <div className="flex flex-row gap-4 p-4">
               <Button
-
-                disabled={attendees.includes(session?.user?.email as string) || event.status === "pending" || isLoading}
-                onClick={() => handleJoinEvent(event._id.toString())}
-              >{
-                  attendees.includes(session?.user?.email as string) ? "Already Joined" : "Join Event"
+                disabled={event.status === "pending" || isLoading}
+                onClick={() =>
+                  attendees.includes(session?.user?.email as string)
+                    ? handleCancelRegistration(event._id.toString())
+                    : handleJoinEvent(event._id.toString())
                 }
+                className={`${attendees.includes(session?.user?.email as string)
+                    ? "bg-red-500 hover:bg-red-600"
+                    : "bg-blue-500 hover:bg-blue-600"
+                  } text-white font-medium px-4 py-2 rounded`}
+              >
+                {attendees.includes(session?.user?.email as string)
+                  ? "Cancel Registration"
+                  : "Join Event"}
               </Button>
+
+
               {isAdmin && (
                 <>
                   <AlertDialog>

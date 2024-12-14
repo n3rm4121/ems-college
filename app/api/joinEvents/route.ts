@@ -58,8 +58,16 @@ export async function POST(req: Request) {
 // DELETE: Withdraw from an event
 export async function DELETE(req: Request) {
     try {
-        const body = await req.json();
-        const { event_id, attendee_id } = body;
+        const session = await auth();
+        if (!session) {
+            return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        }
+
+        const userEmail = session?.user?.email;
+        const url = new URL(req.url);
+        const event_id = url.searchParams.get("event_id");
+
+        const attendee_id = userEmail;
 
         if (!event_id || !attendee_id) {
             return NextResponse.json({ message: "Missing event_id or attendee_id" }, { status: 400 });
@@ -72,14 +80,17 @@ export async function DELETE(req: Request) {
         );
 
         if (!result) {
+            console.log('Event or Attendee not found');
             return NextResponse.json({ message: "Event or Attendee not found" }, { status: 404 });
         }
 
         return NextResponse.json({ success: true, data: result }, { status: 200 });
     } catch (error) {
+        console.log('error: ', error);
         return NextResponse.json({ success: false, error: (error as Error).message }, { status: 400 });
     }
 }
+
 
 // GET: Retrieve attendees for a specific event
 export async function GET(req: Request) {
